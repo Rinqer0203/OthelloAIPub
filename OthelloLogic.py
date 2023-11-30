@@ -51,14 +51,6 @@ def countFlippable(board, action, player, size):
     return total_flips
 
 
-def getFlippableCells(board, action, player, size):
-    for dir in DIRS:
-        can_flip, flips = executeFlip(board, player, action[1], action[0], dir, size)
-        if can_flip:
-            total_flips += len(flips)
-    return total_flips
-
-
 def getMoves(board, player, size):
     moves = []
     for y in range(size):
