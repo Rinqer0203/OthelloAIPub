@@ -16,12 +16,18 @@ class __TestEvaluate2:
         return 7
 
 
+class __TestEvaluate3:
+    def evaluate(self, board, player) -> float:
+        # boardに対する評価値を返す
+        return 3
+
+
 # -----------------ここまで評価関数の定義-----------------
 
 
 # 初期化処理
 # 評価関数を追加したらここに追加する
-__evalute_funcs = [__TestEvaluate(), __TestEvaluate2()]
+__evalute_funcs = [__TestEvaluate(), __TestEvaluate2(), __TestEvaluate3()]
 
 
 # 評価関数を回して評価値を返す
