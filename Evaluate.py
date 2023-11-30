@@ -46,6 +46,7 @@ class __EvaluateBaseBoard:
 
 # -----------------ここまでMove評価関数の定義-----------------
 
+
 # 初期化処理
 # 評価関数を追加したらここに追加する
 __evalute_board_funcs = [__TestEvaluate(), __TestEvaluate2(), __TestEvaluate3()]
@@ -53,7 +54,7 @@ __evalute_board_funcs = [__TestEvaluate(), __TestEvaluate2(), __TestEvaluate3()]
 __evaluate_move_funcs = [__EvaluateBaseBoard()]
 
 
-# 評価関数を回して評価値の合計を返す
+# 評価関数を回してBoard評価値の合計を返す
 def evaluate_board(board, player) -> float:
     evaluate_point = 0
     for func in __evalute_board_funcs:
@@ -61,8 +62,8 @@ def evaluate_board(board, player) -> float:
     return evaluate_point
 
 
+# 評価関数を回してMove評価値の合計を返す
 def evaluate_move(board, move, player) -> float:
-    # 評価関数を回して評価値の合計を返す
     evaluate_point = 0
     for func in __evaluate_move_funcs:
         evaluate_point += func.evaluate(board, move, player)
