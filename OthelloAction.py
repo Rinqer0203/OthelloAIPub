@@ -1,17 +1,69 @@
+import OthelloLogic
 import random
 import Evaluate
+import copy
 from typing import List
 
+LIMIT = 2
 turnCnt = 0
 isActiveMode = False
 
 
 def getAction(board, moves) -> List[int]:
     # 自分のターンにフロントエンドから呼ばれるメソッド
-
     check_active_mode()
 
-    return select_max_eval_moves(board, moves, 1)
+    # return select_max_eval_moves(board, moves, 1)
+
+    maxEvalMove = float("-inf"), None
+    for move in moves:
+        eval = minLevel(board, move, LIMIT, -1)
+        # print(f"eval: {eval}")
+        if eval > maxEvalMove[0]:
+            maxEvalMove = eval, move
+    return maxEvalMove[1]
+
+
+def minLevel(board, move, limit, player) -> float:
+    if limit == 0:
+        return Evaluate.evaluate_move(board, move, player) * player
+
+    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, 8)
+    nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
+
+    if len(nextMoves) == 0:
+        return Evaluate.evaluate_move(board, move, player) * player
+
+    debug_print(move, limit, player, nextBoard, nextMoves)
+
+    minEval = float("inf")
+    for nextMove in nextMoves:
+        minEval = min(maxLevel(nextBoard, nextMove, limit - 1, -player), minEval)
+    return minEval
+
+
+def maxLevel(board, move, limit, player) -> float:
+    if limit == 0:
+        return Evaluate.evaluate_move(board, move, player) * player
+
+    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, 8)
+    nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
+
+    if len(nextMoves) == 0:
+        return Evaluate.evaluate_move(board, move, player) * player
+
+    debug_print(move, limit, player, nextBoard, nextMoves)
+
+    maxEval = float("-inf")
+    for nextMove in nextMoves:
+        maxEval = max(minLevel(nextBoard, nextMove, limit - 1, -player), maxEval)
+    return maxEval
+
+
+def debug_print(move, limit, player, nextBoard, nextMoves):
+    print(f"-------- move: {move} limit: {limit} player: {player} --------")
+    OthelloLogic.printBoardWithCell(nextBoard, player, nextMoves, 8)
+    print(f"nextMoves: {nextMoves}\n")
 
 
 def check_active_mode():
