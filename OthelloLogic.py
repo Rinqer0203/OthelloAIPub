@@ -107,7 +107,7 @@ def printBoard(board):
 
 
 def printBoardWithCell(board, player, move, size):
-    print(f"player = {"○" if player == 1 else "●"}")
+    print(f"player = {'○' if player == 1 else '●'}")
     print("  ", end="")
     for i in range(size):
         print(f" {i}", end=" ")
