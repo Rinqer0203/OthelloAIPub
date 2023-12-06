@@ -106,7 +106,7 @@ def printBoard(board):
         print(row)
 
 
-def printBoardWithCell(board, player, move, size):
+def printBoardWithCell(board, player, moves, size):
     print(f"player = {'○' if player == 1 else '●'}")
     print("  ", end="")
     for i in range(size):
@@ -117,7 +117,8 @@ def printBoardWithCell(board, player, move, size):
         row = f"{x} |"
         for y in range(size):
             cell = "○ " if board[x][y] == 1 else "● " if board[x][y] == -1 else "  "
-            if cell == "  " and [x, y] in move:
+            # movesに入っている座標ならば、そのセルを✕にする
+            if cell == "  " and [y, x] in moves:
                 cell = "✕ "
             row += cell + "|"
         print(row)
