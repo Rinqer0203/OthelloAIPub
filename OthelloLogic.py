@@ -113,9 +113,9 @@ def printBoardWithCell(board, player, move, size):
         print(f" {i}", end=" ")
     print("")
 
-    for y in range(size):
-        row = f"{y} |"
-        for x in range(size):
+    for x in range(size):
+        row = f"{x} |"
+        for y in range(size):
             cell = "○ " if board[x][y] == 1 else "● " if board[x][y] == -1 else "  "
             if cell == "  " and [x, y] in move:
                 cell = "✕ "
