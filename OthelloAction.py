@@ -5,7 +5,7 @@ import copy
 from typing import List
 
 SIZE = 8
-LIMIT = 2
+LIMIT = 3
 turnCnt = 0
 isActiveMode = False
 
@@ -19,7 +19,9 @@ def getAction(board, moves) -> List[int]:
     maxEvalMove = float("-inf"), None
     for move in moves:
         eval = minLevel(board, move, LIMIT, -1)
-        # print(f"eval: {eval}")
+        print("=====================================")
+        print(f"move : {move} eval: {eval}")
+        print("=====================================")
         if eval > maxEvalMove[0]:
             maxEvalMove = eval, move
     return maxEvalMove[1]
@@ -35,11 +37,19 @@ def minLevel(board, move, limit, player) -> float:
     if len(nextMoves) == 0:
         return Evaluate.evaluate_move(board, move, player) * player
 
-    debug_print(move, limit, player, nextBoard, nextMoves)
+    # debug_print(move, limit, player, nextBoard, nextMoves)
 
     minEval = float("inf")
     for nextMove in nextMoves:
+        if limit is 2:
+            eval = maxLevel(nextBoard, nextMove, limit - 1, -player)
+            print("-----")
+            print(eval)
+            print("-----")
         minEval = min(maxLevel(nextBoard, nextMove, limit - 1, -player), minEval)
+
+    if limit is 2:
+        print(f"minEval: {minEval}")
     return minEval
 
 
@@ -53,11 +63,12 @@ def maxLevel(board, move, limit, player) -> float:
     if len(nextMoves) == 0:
         return Evaluate.evaluate_move(board, move, player) * player
 
-    debug_print(move, limit, player, nextBoard, nextMoves)
+    # debug_print(move, limit, player, nextBoard, nextMoves)
 
     maxEval = float("-inf")
     for nextMove in nextMoves:
         maxEval = max(minLevel(nextBoard, nextMove, limit - 1, -player), maxEval)
+
     return maxEval
 
 

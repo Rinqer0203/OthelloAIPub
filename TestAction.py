@@ -15,5 +15,5 @@ def __Test(board, testName):
 
 
 if __name__ == "__main__":
-    __Test(TestBoardProvider.generate_initial_board(), "initial board test")
-    # __Test(TestBoardProvider.generate_board1(), "board1 test")
+    # __Test(TestBoardProvider.generate_initial_board(), "initial board test")
+    __Test(TestBoardProvider.generate_board1(), "board1 test")
