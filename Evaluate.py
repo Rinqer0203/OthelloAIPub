@@ -5,21 +5,30 @@ import TestBoardProvider
 
 
 class __TestEvaluate:
+    def __init__(self):
+        self.baseBoardPoint = [
+            [30, -12, 0, -1, -1, 0, -12, 30],
+            [-12, -15, -3, -3, -3, -3, -15, -12],
+            [0, -3, 0, -1, -1, 0, -3, 0],
+            [-1, -3, -1, -1, -1, -1, -3, -1],
+            [-1, -3, -1, -1, -1, -1, -3, -1],
+            [0, -3, 0, -1, -1, 0, -3, 0],
+            [-12, -15, -3, -3, -3, -3, -15, -12],
+            [30, -12, 0, -1, -1, 0, -12, 30],
+        ]
+
     def evaluate(self, board, player) -> float:
-        # boardに対する評価値を返す
-        return 3
+        playerScore = enemyScore = 0
+        for x in range(8):
+            for y in range(8):
+                if board[x][y] == 1:
+                    playerScore += self.baseBoardPoint[x][y]
+                elif board[x][y] == -1:
+                    enemyScore += self.baseBoardPoint[x][y]
 
-
-class __TestEvaluate2:
-    def evaluate(self, board, player) -> float:
-        # boardに対する評価値を返す
-        return 7
-
-
-class __TestEvaluate3:
-    def evaluate(self, board, player) -> float:
-        # boardに対する評価値を返す
-        return 3
+        if player == 1:
+            return playerScore - enemyScore
+        return enemyScore - playerScore
 
 
 # -----------------ここまでBoard評価関数の定義-----------------
@@ -50,7 +59,7 @@ class __EvaluateBaseBoard:
 
 # 初期化処理
 # 評価関数を追加したらここに追加する
-__evalute_board_funcs = [__TestEvaluate(), __TestEvaluate2(), __TestEvaluate3()]
+__evalute_board_funcs = [__TestEvaluate()]
 
 __evaluate_move_funcs = [__EvaluateBaseBoard()]
 
