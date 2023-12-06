@@ -4,6 +4,7 @@ import OthelloLogic
 import Evaluate
 import copy
 import InactiveEvaluate
+from multiprocessing import Pool
 from typing import List
 
 SIZE = 8
@@ -11,28 +12,33 @@ LIMIT = 5
 turnCnt = 0
 isActiveMode = False
 
-evaluateCnt = 0
-
 
 def getAction(board, moves) -> List[int]:
     check_active_mode()
 
-    # return select_max_eval_moves(board, moves, 1)
-    # return inactive_action(board, moves, 1)
+    print(f"moves: {moves}")
 
-    check_active_mode()
+    # アルファとベータの初期値
+    alpha = float("-inf")
+    beta = float("inf")
 
+    # プールを作成
+    with Pool() as pool:
+        # 各手に対する minLevel の実行結果を取得（アルファベータ枝刈りを適用）
+        evals = pool.starmap(
+            minLevel, [(board, move, LIMIT, -1, alpha, beta) for move in moves]
+        )
+
+    # 最も良い手を選択
     maxEvalMove = float("-inf"), None
-    for move in moves:
-        eval = minLevel(board, move, LIMIT, -1)
+    for move, eval in zip(moves, evals):
         print("=====================================")
         print(f"move : {move} eval: {eval}")
         print("=====================================")
         if eval > maxEvalMove[0]:
             maxEvalMove = eval, move
+
     print(f"決定した手: {maxEvalMove[1]} 評価値: {maxEvalMove[0]}")
-    print(f"evaluateCnt: {evaluateCnt}")
-    reset_evaluateCnt()
     return maxEvalMove[1]
 
 
@@ -49,56 +55,34 @@ def inactive_action(board, moves, player):
     return sortedMoves[0]
 
 
-def minLevel(board, move, limit, player) -> float:
-    if limit == 0:
-        increment_evaluateCnt()
-        return Evaluate.evaluate_move(board, move, player) * player
-
+def minLevel(board, move, limit, player, alpha, beta):
     nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, SIZE)
     nextMoves = OthelloLogic.getMoves(nextBoard, player, SIZE)
 
-    if len(nextMoves) == 0:
-        increment_evaluateCnt()
-        return Evaluate.evaluate_move(board, move, player) * player
+    if len(nextMoves) == 0 or limit == 0:
+        return Evaluate.evaluate_board(nextBoard, player)
 
-    # debug_print(move, limit, player, nextBoard, nextMoves)
-
-    minEval = float("inf")
     for nextMove in nextMoves:
-        minEval = min(maxLevel(nextBoard, nextMove, limit - 1, -player), minEval)
+        eval = maxLevel(nextBoard, nextMove, limit - 1, -player, alpha, beta)
+        beta = min(beta, eval)
+        if beta <= alpha:
+            break  # アルファカットオフ
+    return beta
 
-    return minEval
 
-
-def maxLevel(board, move, limit, player) -> float:
-    if limit == 0:
-        increment_evaluateCnt()
-        return Evaluate.evaluate_move(board, move, player) * player
-
+def maxLevel(board, move, limit, player, alpha, beta):
     nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, SIZE)
     nextMoves = OthelloLogic.getMoves(nextBoard, player, SIZE)
 
-    if len(nextMoves) == 0:
-        increment_evaluateCnt()
-        return Evaluate.evaluate_move(board, move, player) * player
+    if len(nextMoves) == 0 or limit == 0:
+        return Evaluate.evaluate_board(nextBoard, player)
 
-    # debug_print(move, limit, player, nextBoard, nextMoves)
-
-    maxEval = float("-inf")
     for nextMove in nextMoves:
-        maxEval = max(minLevel(nextBoard, nextMove, limit - 1, -player), maxEval)
-
-    return maxEval
-
-
-def increment_evaluateCnt():
-    global evaluateCnt
-    evaluateCnt += 1
-
-
-def reset_evaluateCnt():
-    global evaluateCnt
-    evaluateCnt = 0
+        eval = minLevel(nextBoard, nextMove, limit - 1, -player, alpha, beta)
+        alpha = max(alpha, eval)
+        if alpha >= beta:
+            break  # ベータカットオフ
+    return alpha
 
 
 def debug_print(move, limit, player, nextBoard, nextMoves):
