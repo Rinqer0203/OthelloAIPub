@@ -4,6 +4,7 @@ import Evaluate
 import copy
 from typing import List
 
+SIZE = 8
 LIMIT = 2
 turnCnt = 0
 isActiveMode = False
@@ -28,13 +29,14 @@ def minLevel(board, move, limit, player) -> float:
     if limit == 0:
         return Evaluate.evaluate_move(board, move, player) * player
 
-    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, 8)
-    nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
+    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, SIZE)
+    nextMoves = OthelloLogic.getMoves(nextBoard, player, SIZE)
 
     if len(nextMoves) == 0:
         return Evaluate.evaluate_move(board, move, player) * player
 
     debug_print(move, limit, player, nextBoard, nextMoves)
+    OthelloLogic.printBoard(nextBoard)
 
     minEval = float("inf")
     for nextMove in nextMoves:
@@ -46,13 +48,14 @@ def maxLevel(board, move, limit, player) -> float:
     if limit == 0:
         return Evaluate.evaluate_move(board, move, player) * player
 
-    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, 8)
-    nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
+    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, SIZE)
+    nextMoves = OthelloLogic.getMoves(nextBoard, player, SIZE)
 
     if len(nextMoves) == 0:
         return Evaluate.evaluate_move(board, move, player) * player
 
     debug_print(move, limit, player, nextBoard, nextMoves)
+    OthelloLogic.printBoard(nextBoard)
 
     maxEval = float("-inf")
     for nextMove in nextMoves:
@@ -62,7 +65,7 @@ def maxLevel(board, move, limit, player) -> float:
 
 def debug_print(move, limit, player, nextBoard, nextMoves):
     print(f"-------- move: {move} limit: {limit} player: {player} --------")
-    OthelloLogic.printBoardWithCell(nextBoard, player, nextMoves, 8)
+    OthelloLogic.printBoardWithCell(nextBoard, player, nextMoves, SIZE)
     print(f"nextMoves: {nextMoves}\n")
 
 
