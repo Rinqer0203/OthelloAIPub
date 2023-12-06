@@ -36,7 +36,6 @@ def minLevel(board, move, limit, player) -> float:
         return Evaluate.evaluate_move(board, move, player) * player
 
     debug_print(move, limit, player, nextBoard, nextMoves)
-    OthelloLogic.printBoard(nextBoard)
 
     minEval = float("inf")
     for nextMove in nextMoves:
@@ -55,7 +54,6 @@ def maxLevel(board, move, limit, player) -> float:
         return Evaluate.evaluate_move(board, move, player) * player
 
     debug_print(move, limit, player, nextBoard, nextMoves)
-    OthelloLogic.printBoard(nextBoard)
 
     maxEval = float("-inf")
     for nextMove in nextMoves:
