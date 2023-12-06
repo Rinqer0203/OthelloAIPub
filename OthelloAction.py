@@ -5,9 +5,11 @@ import copy
 from typing import List
 
 SIZE = 8
-LIMIT = 3
+LIMIT = 5
 turnCnt = 0
 isActiveMode = False
+
+evaluateCnt = 0
 
 
 def getAction(board, moves) -> List[int]:
@@ -24,43 +26,43 @@ def getAction(board, moves) -> List[int]:
         print("=====================================")
         if eval > maxEvalMove[0]:
             maxEvalMove = eval, move
+    print(f"決定した手: {maxEvalMove[1]} 評価値: {maxEvalMove[0]}")
+    print(f"evaluateCnt: {evaluateCnt}")
+    reset_evaluateCnt()
     return maxEvalMove[1]
 
 
 def minLevel(board, move, limit, player) -> float:
     if limit == 0:
+        increment_evaluateCnt()
         return Evaluate.evaluate_move(board, move, player) * player
 
     nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, SIZE)
     nextMoves = OthelloLogic.getMoves(nextBoard, player, SIZE)
 
     if len(nextMoves) == 0:
+        increment_evaluateCnt()
         return Evaluate.evaluate_move(board, move, player) * player
 
     # debug_print(move, limit, player, nextBoard, nextMoves)
 
     minEval = float("inf")
     for nextMove in nextMoves:
-        if limit is 2:
-            eval = maxLevel(nextBoard, nextMove, limit - 1, -player)
-            print("-----")
-            print(eval)
-            print("-----")
         minEval = min(maxLevel(nextBoard, nextMove, limit - 1, -player), minEval)
 
-    if limit is 2:
-        print(f"minEval: {minEval}")
     return minEval
 
 
 def maxLevel(board, move, limit, player) -> float:
     if limit == 0:
+        increment_evaluateCnt()
         return Evaluate.evaluate_move(board, move, player) * player
 
     nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, SIZE)
     nextMoves = OthelloLogic.getMoves(nextBoard, player, SIZE)
 
     if len(nextMoves) == 0:
+        increment_evaluateCnt()
         return Evaluate.evaluate_move(board, move, player) * player
 
     # debug_print(move, limit, player, nextBoard, nextMoves)
@@ -70,6 +72,16 @@ def maxLevel(board, move, limit, player) -> float:
         maxEval = max(minLevel(nextBoard, nextMove, limit - 1, -player), maxEval)
 
     return maxEval
+
+
+def increment_evaluateCnt():
+    global evaluateCnt
+    evaluateCnt += 1
+
+
+def reset_evaluateCnt():
+    global evaluateCnt
+    evaluateCnt = 0
 
 
 def debug_print(move, limit, player, nextBoard, nextMoves):
