@@ -20,10 +20,7 @@ def getAction(board, moves) -> List[int]:
     # return select_max_eval_moves(board, moves, 1)
     # return inactive_action(board, moves, 1)
 
-    # 自分のターンにフロントエンドから呼ばれるメソッド
     check_active_mode()
-
-    # return select_max_eval_moves(board, moves, 1)
 
     maxEvalMove = float("-inf"), None
     for move in moves:
