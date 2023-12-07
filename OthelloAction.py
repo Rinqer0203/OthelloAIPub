@@ -49,6 +49,15 @@ def getAction(board, moves) -> List[int]:
     print(f"処理時間: {end_time - start_time}s")
     return maxEvalMove[1]
 
+    """
+    #並列化しない場合
+    maxEvalMove = float("-inf"), None
+    for move in moves:
+        eval = minLevel(board, move, limit, -1, alpha, beta)
+        if eval > maxEvalMove[0]:
+            maxEvalMove = eval, move
+    """
+
 
 def inactive_action(board, moves, player):
     """
