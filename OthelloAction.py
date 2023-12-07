@@ -1,44 +1,57 @@
 import OthelloLogic
 import random
-import OthelloLogic
 import Evaluate
 import copy
 import InactiveEvaluate
+import time
 from multiprocessing import Pool
 from typing import List
 
 SIZE = 8
-LIMIT = 5
-turnCnt = 0
-isActiveMode = False
 
 
 def getAction(board, moves) -> List[int]:
-    check_active_mode()
+    print("=====================================")
+    print(f"len : {len(moves)} moves: {moves}")
 
-    print(f"moves: {moves}")
+    if check_active_mode(board) is False and False:
+        # 30ターン経過していない場合は最弱モード
+        return inactive_action(board, moves, 1)
+
+    # 処理時間計測開始
+    start_time = time.time()
 
     # アルファとベータの初期値
     alpha = float("-inf")
     beta = float("inf")
 
+    stoneNum = count_stone(board)
+    print(f"stoneNum: {stoneNum}")
+    limit = 0
+    if stoneNum >= 48:
+        limit = 8
+    else:
+        limit = 5 if len(moves) >= 12 else 5  # 6
+
+    print(f"limit: {limit}")
+
     # プールを作成
     with Pool() as pool:
-        # 各手に対する minLevel の実行結果を取得（アルファベータ枝刈りを適用）
         evals = pool.starmap(
-            minLevel, [(board, move, LIMIT, -1, alpha, beta) for move in moves]
+            minLevel, [(board, move, limit, -1, alpha, beta) for move in moves]
         )
 
-    # 最も良い手を選択
     maxEvalMove = float("-inf"), None
     for move, eval in zip(moves, evals):
-        print("=====================================")
-        print(f"move : {move} eval: {eval}")
-        print("=====================================")
+        # print("=====================================")
+        # print(f"move : {move} eval: {eval}")
+        # print("=====================================")
         if eval > maxEvalMove[0]:
             maxEvalMove = eval, move
 
+    end_time = time.time()
     print(f"決定した手: {maxEvalMove[1]} 評価値: {maxEvalMove[0]}")
+    print(f"処理時間: {end_time - start_time}")
     return maxEvalMove[1]
 
 
@@ -91,18 +104,24 @@ def debug_print(move, limit, player, nextBoard, nextMoves):
     print(f"nextMoves: {nextMoves}\n")
 
 
-def check_active_mode():
+def check_active_mode(board):
     """
-    30ターン経過したらisActiveModeをTrueにする
+    30ターン経過したらTrueになる
     """
-    global turnCnt
-    global isActiveMode
+    return count_stone(board) >= 34
 
-    if turnCnt > 30:
-        isActiveMode = True
-    turnCnt += 2
 
-    print(f"turnCnt: {turnCnt} isActiveMode: {isActiveMode}")
+def count_stone(board):
+    """
+    石の数をカウントして返す
+    """
+    stoneCnt = 0
+    # 石の数をカウント
+    for x in range(len(board)):
+        for y in range(len(board)):
+            if board[x][y] != 0:
+                stoneCnt += 1
+    return stoneCnt
 
 
 def select_max_eval_moves(board, moves, player) -> List[int]:
