@@ -32,8 +32,8 @@ if __name__ == "__main__":
             print(f"ランダムで手を決定 : {action}")
 
         board = OthelloLogic.execute(board, action, player, 8)
+        OthelloLogic.printBoardWithCell(board, player, [-1, -1], 8)
         player *= -1
-        OthelloLogic.printBoard(board)
 
     playerOneStoneCnt = playerMinusStoneCnt = 0
 
