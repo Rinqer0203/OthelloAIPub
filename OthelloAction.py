@@ -1,5 +1,4 @@
 import OthelloLogic
-import random
 import Evaluate
 import copy
 import InactiveEvaluate
@@ -7,14 +6,12 @@ import time
 from multiprocessing import Pool
 from typing import List
 
-SIZE = 8
-
 
 def getAction(board, moves) -> List[int]:
     print("=====================================")
     print(f"len : {len(moves)} moves: {moves}")
 
-    if check_active_mode(board) is False and False:
+    if check_active_mode(board) is False:
         # 30ターン経過していない場合は最弱モード
         return inactive_action(board, moves, 1)
 
@@ -31,7 +28,7 @@ def getAction(board, moves) -> List[int]:
     if stoneNum >= 48:
         limit = 8
     else:
-        limit = 5 if len(moves) >= 12 else 5  # 6
+        limit = 5 if len(moves) >= 12 else 6  # 6
 
     print(f"limit: {limit}")
 
@@ -43,15 +40,12 @@ def getAction(board, moves) -> List[int]:
 
     maxEvalMove = float("-inf"), None
     for move, eval in zip(moves, evals):
-        # print("=====================================")
-        # print(f"move : {move} eval: {eval}")
-        # print("=====================================")
         if eval > maxEvalMove[0]:
             maxEvalMove = eval, move
 
     end_time = time.time()
     print(f"決定した手: {maxEvalMove[1]} 評価値: {maxEvalMove[0]}")
-    print(f"処理時間: {end_time - start_time}")
+    print(f"処理時間: {end_time - start_time}s")
     return maxEvalMove[1]
 
 
@@ -98,12 +92,6 @@ def maxLevel(board, move, limit, player, alpha, beta):
     return alpha
 
 
-def debug_print(move, limit, player, nextBoard, nextMoves):
-    print(f"-------- move: {move} limit: {limit} player: {player} --------")
-    OthelloLogic.printBoardWithCell(nextBoard, player, nextMoves, SIZE)
-    print(f"nextMoves: {nextMoves}\n")
-
-
 def check_active_mode(board):
     """
     30ターン経過したらTrueになる
@@ -124,24 +112,7 @@ def count_stone(board):
     return stoneCnt
 
 
-def select_max_eval_moves(board, moves, player) -> List[int]:
-    """
-    渡されたMovesの中から評価値が最大のものを返却する。
-    """
-    maxEvalMove = float("-inf"), None
-
-    for move in moves:
-        eval = Evaluate.evaluate_move(board, move, player)
-        if maxEvalMove[0] < eval:
-            maxEvalMove = eval, move
-
-    print(f"決定した手: {maxEvalMove[1]} 評価値: {maxEvalMove[0]}")
-    return maxEvalMove[1]
-
-
-def select_random_moves(moves) -> List[int]:
-    """
-    渡されたMovesの中からランダムで返り値として返却する。
-    """
-    index = random.randrange(len(moves))
-    return moves[index]
+def debug_print(move, limit, player, nextBoard, nextMoves):
+    print(f"-------- move: {move} limit: {limit} player: {player} --------")
+    OthelloLogic.printBoardWithCell(nextBoard, player, nextMoves, SIZE)
+    print(f"nextMoves: {nextMoves}\n")
