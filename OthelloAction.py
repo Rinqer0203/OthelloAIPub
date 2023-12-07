@@ -26,7 +26,7 @@ def getAction(board, moves) -> List[int]:
     print(f"stoneNum: {stoneNum}")
     limit = 0
     if stoneNum >= 48:
-        limit = 8
+        limit = 7
     else:
         limit = 5 if len(moves) >= 12 else 6  # 6
 
