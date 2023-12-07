@@ -63,8 +63,8 @@ def inactive_action(board, moves, player):
 
 
 def minLevel(board, move, limit, player, alpha, beta):
-    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, SIZE)
-    nextMoves = OthelloLogic.getMoves(nextBoard, player, SIZE)
+    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, 8)
+    nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
 
     if len(nextMoves) == 0 or limit == 0:
         return Evaluate.evaluate_board(nextBoard, player)
@@ -78,8 +78,8 @@ def minLevel(board, move, limit, player, alpha, beta):
 
 
 def maxLevel(board, move, limit, player, alpha, beta):
-    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, SIZE)
-    nextMoves = OthelloLogic.getMoves(nextBoard, player, SIZE)
+    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, 8)
+    nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
 
     if len(nextMoves) == 0 or limit == 0:
         return Evaluate.evaluate_board(nextBoard, player)
@@ -114,5 +114,5 @@ def count_stone(board):
 
 def debug_print(move, limit, player, nextBoard, nextMoves):
     print(f"-------- move: {move} limit: {limit} player: {player} --------")
-    OthelloLogic.printBoardWithCell(nextBoard, player, nextMoves, SIZE)
+    OthelloLogic.printBoardWithCell(nextBoard, player, nextMoves, 8)
     print(f"nextMoves: {nextMoves}\n")
