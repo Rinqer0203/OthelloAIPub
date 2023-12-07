@@ -76,7 +76,7 @@ class __EvaluateStoneCount:
         # evalを正規化
         if playerStones + enemyStones == 0:
             return 0
-        return (playerStones - enemyStones) / (playerStones + enemyStones)
+        return (playerStones - enemyStones) / (playerStones + enemyStones) * 5
 
 
 # -----------------ここまでBoard評価関数の定義-----------------

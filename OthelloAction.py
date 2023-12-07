@@ -22,6 +22,7 @@ def getAction(board, moves) -> List[int]:
     alpha = float("-inf")
     beta = float("inf")
 
+    # 探索の深さを決定
     stoneNum = count_stone(board)
     print(f"stoneNum: {stoneNum}")
     limit = 0
