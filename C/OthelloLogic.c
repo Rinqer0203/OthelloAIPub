@@ -4,8 +4,6 @@
 
 const Vec2 DIRS[8] = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
 
-#define IS_IN_BOARD(x, y) (0 <= x && x < BOARD_SIZE && 0 <= y && y < BOARD_SIZE)
-
 bool executeFlip(int board[][BOARD_SIZE], int player, Vec2 action, Vec2 dir)
 {
 
@@ -91,7 +89,7 @@ bool search(int board[][BOARD_SIZE], Vec2 putCell, Vec2 dir, int player, Vec2 *r
     return false;
 }
 
-int getMoves(int board[][BOARD_SIZE], Vec2 moves[MAX_MOVES])
+int getMoves(int board[][BOARD_SIZE], Vec2 moves[MAX_MOVES], int player)
 {
     int movesCount = 0;
 
@@ -100,13 +98,13 @@ int getMoves(int board[][BOARD_SIZE], Vec2 moves[MAX_MOVES])
         for (int x = 0; x < BOARD_SIZE; x++)
         {
             // 相手プレイヤーの駒は-1と仮定
-            if (board[x][y] != -1)
+            if (board[x][y] != -player)
                 continue;
 
             for (int i = 0; i < 8; i++)
             {
                 Vec2 result;
-                if (!search(board, (Vec2){x, y}, DIRS[i], 1, &result))
+                if (!search(board, (Vec2){x, y}, DIRS[i], player, &result))
                     continue;
 
                 // 既存の手が存在するかチェック
@@ -123,8 +121,6 @@ int getMoves(int board[][BOARD_SIZE], Vec2 moves[MAX_MOVES])
                     continue;
 
                 moves[movesCount++] = result;
-                if (movesCount >= MAX_MOVES)
-                    return movesCount;
             }
         }
     }

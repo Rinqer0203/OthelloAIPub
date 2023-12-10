@@ -1,5 +1,6 @@
 import TestBoardProvider
 import OthelloLogic
+import Evaluate
 import subprocess
 import ctypes
 import time
@@ -21,6 +22,7 @@ class CModule:
             (ctypes.c_int * 2) * (MOVES_MAX_LENGTH + 1)
         )
         self.dll.Action.restype = ctypes.POINTER(ctypes.c_int * 2)
+        self.dll.evaluate.restype = ctypes.c_float
 
     def __convert_2d_array(self, c_type, data):
         """
@@ -44,9 +46,9 @@ class CModule:
         # 結果をPythonのリストに変換
         return list(result_ptr.contents)
 
-    def get_moves(self, board):
+    def get_moves(self, board, player):
         board_array = self.__convert_2d_array(ctypes.c_int, board)
-        result_ptr = self.dll.getMovesC(board_array)
+        result_ptr = self.dll.getMovesC(board_array, player)
 
         # 結果をPythonのリストに変換
         moves = []
@@ -56,6 +58,10 @@ class CModule:
             moves.append(list(move))
 
         return moves
+
+    def evaluate(self, board, player, limit):
+        board_array = self.__convert_2d_array(ctypes.c_int, board)
+        return self.dll.evaluate(board_array, player, limit)
 
 
 def generate_c_module() -> ctypes.WinDLL:
@@ -77,10 +83,11 @@ def __load_dll() -> ctypes.WinDLL:
 def benchmark():
     cModule = generate_c_module()
     board = TestBoardProvider.generate_initial_board()
+    player = 1
 
     start_time = time.time()
     for _ in range(1000):
-        moves = cModule.get_moves(board)
+        moves = cModule.get_moves(board, player)
     end_time = time.time()
     print(f"cModule 処理時間: {end_time - start_time}s")
 
@@ -91,9 +98,30 @@ def benchmark():
     print(f"python 処理時間: {end_time - start_time}s")
 
 
+def check_move():
+    cModule = generate_c_module()
+    board = TestBoardProvider.generate_board2()
+    player = 1
+
+    print(cModule.get_moves(board, player))
+    print(OthelloLogic.getMoves(board, player, 8))
+
+
+def test_evaluate(cModule, board, player):
+    eval = cModule.evaluate(board, player, 3)
+    print(f"C eval: {eval}")
+    eval = Evaluate.evaluate_board(board, player)
+    print(f"python eval: {eval}")
+
+
 if __name__ == "__main__":
     # benchmark()
+    # check_move()
     cModule = generate_c_module()
     board = TestBoardProvider.generate_board3()
-    print(cModule.get_moves(board))
-    print(OthelloLogic.getMoves(board, 1, 8))
+    player = -1
+
+    test_evaluate(cModule, TestBoardProvider.generate_board3(), player)
+    test_evaluate(cModule, TestBoardProvider.generate_board2(), player)
+    test_evaluate(cModule, TestBoardProvider.generate_board1(), player)
+    test_evaluate(cModule, TestBoardProvider.generate_evaluate_board1(), player)
