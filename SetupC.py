@@ -92,4 +92,8 @@ def benchmark():
 
 
 if __name__ == "__main__":
-    benchmark()
+    # benchmark()
+    cModule = generate_c_module()
+    board = TestBoardProvider.generate_board3()
+    print(cModule.get_moves(board))
+    print(OthelloLogic.getMoves(board, 1, 8))

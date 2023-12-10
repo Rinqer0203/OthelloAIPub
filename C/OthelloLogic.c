@@ -2,34 +2,36 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-const Vec2 DIRS[8] = {{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}};
+const Vec2 DIRS[8] = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
 
-bool executeFlip(int board[][BOARD_SIZE], int player, int x, int y, Vec2 dir)
+#define IS_IN_BOARD(x, y) (0 <= x && x < BOARD_SIZE && 0 <= y && y < BOARD_SIZE)
+
+bool executeFlip(int board[][BOARD_SIZE], int player, Vec2 action, Vec2 dir)
 {
-    if (x + dir.x < 0 || x + dir.x >= BOARD_SIZE || y + dir.y < 0 || y + dir.y >= BOARD_SIZE)
+
+    if (IS_IN_BOARD(action.x, action.y) == false)
     {
         return false;
     }
 
-    if (board[x + dir.x][y + dir.y] == -player)
+    if (board[action.x + dir.x][action.y + dir.y] == -player)
     {
-        int tempX = x + dir.x;
-        int tempY = y + dir.y;
+        int tempX = action.x + dir.x;
+        int tempY = action.y + dir.y;
 
         while (true)
         {
             tempX += dir.x;
             tempY += dir.y;
 
-            if (tempX < 0 || tempX >= BOARD_SIZE || tempY < 0 || tempY >= BOARD_SIZE)
+            if (IS_IN_BOARD(tempX, tempY) == false)
             {
                 return false;
             }
 
             if (board[tempX][tempY] == player)
             {
-                // Flip the pieces
-                while (tempX != x || tempY != y)
+                while (tempX != action.x || tempY != action.y)
                 {
                     tempX -= dir.x;
                     tempY -= dir.y;
@@ -53,7 +55,7 @@ void execute(int board[][BOARD_SIZE], Vec2 action, int player)
 
     for (int i = 0; i < 8; i++)
     {
-        executeFlip(board, player, action.x, action.y, DIRS[i]);
+        executeFlip(board, player, action, DIRS[i]);
     }
 }
 
@@ -62,16 +64,14 @@ bool search(int board[][BOARD_SIZE], Vec2 putCell, Vec2 dir, int player, Vec2 *r
     Vec2 nextCell = {putCell.x + dir.x, putCell.y + dir.y};
 
     // 次のセルが範囲外か、空でない場合は0を返す
-    if (nextCell.x < 0 || nextCell.x >= BOARD_SIZE ||
-        nextCell.y < 0 || nextCell.y >= BOARD_SIZE ||
+    if (IS_IN_BOARD(nextCell.x, nextCell.y) == false ||
         board[nextCell.x][nextCell.y] != 0)
         return false;
 
     Vec2 reverseDir = {-dir.x, -dir.y};
     Vec2 current = {putCell.x + reverseDir.x, putCell.y + reverseDir.y};
 
-    while (current.x >= 0 && current.x < BOARD_SIZE &&
-           current.y >= 0 && current.y < BOARD_SIZE)
+    while (IS_IN_BOARD(current.x, current.y))
     {
         if (board[current.x][current.y] == player)
         {
