@@ -13,6 +13,7 @@ float evaluateBoard(int board[][BOARD_SIZE], int player);
 bool isSpecialCornerAround(int x, int y, int board[BOARD_SIZE][BOARD_SIZE], int player);
 float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE], int player);
 float evaluateBase(int board[BOARD_SIZE][BOARD_SIZE], int player);
+void copyBoard(int src[][BOARD_SIZE], int dest[][BOARD_SIZE]);
 
 void convertIntMovesToVec2(int src[][2], Vec2 dest[], int movesLength)
 {
@@ -53,18 +54,50 @@ int (*getMovesC(int board[][BOARD_SIZE], int player))[2]
     return staticMoves;
 }
 
+int evalCnt = 0;
+
 float evaluate(int board[][BOARD_SIZE], int player, int limit)
 {
-    return evaluateBoard(board, player) * player;
+    evalCnt = 0;
+    Vec2 moves[MAX_MOVES];
+    int moveLen = getMoves(board, moves, player);
+
+    if (moveLen == 0)
+        return evaluateBoard(board, player);
+
+    float alpha = -FLT_MAX;
+    float beta = FLT_MAX;
+    float maxValue = -FLT_MAX;
+
+    for (int i = 0; i < moveLen; i++)
+    {
+        Vec2 move = moves[i];
+        int nextBoard[BOARD_SIZE][BOARD_SIZE];
+        copyBoard(board, nextBoard);
+        execute(nextBoard, move, player);
+        // printf("move %d %d : nextBoard\n", move.x, move.y);
+        // PrintBoard(nextBoard);
+
+        float value = minLevel(nextBoard, limit - 1, -player, alpha, beta);
+        maxValue = fmax(maxValue, value);
+
+        // alpha = fmax(alpha, value);
+        // if (beta <= alpha)
+        //     break; // アルファベータ枝刈り
+    }
+
+    printf("evalCnt: %d\n", evalCnt);
+    return maxValue;
 }
 
 //--------------------------------------------------
 
 float evaluateBoard(int board[][BOARD_SIZE], int player)
 {
+    evalCnt++;
     float stoneCount = evaluateStoneCount(board, player);
     float base = evaluateBase(board, player);
-    return stoneCount + base;
+    return (stoneCount + base) * player;
 }
 
 void copyBoard(int src[][BOARD_SIZE], int dest[][BOARD_SIZE])

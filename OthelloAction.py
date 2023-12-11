@@ -3,15 +3,21 @@ import Evaluate
 import copy
 import InactiveEvaluate
 import time
+import SetupC
 from multiprocessing import Pool
 from typing import List
+
+
+def evaluate_wrapper(board, player, limit):
+    cModule = SetupC.generate_c_module()
+    return cModule.evaluate(board, player, limit)
 
 
 def getAction(board, moves) -> List[int]:
     print("=====================================")
     print(f"len : {len(moves)} moves: {moves}")
 
-    if check_active_mode(board) is False:
+    if check_active_mode(board) is False and False:
         # 30ターン経過していない場合は最弱モード
         return inactive_action(board, moves, 1)
 
@@ -25,19 +31,18 @@ def getAction(board, moves) -> List[int]:
     # 探索の深さを決定
     stoneNum = count_stone(board)
     print(f"stoneNum: {stoneNum}")
-    limit = 0
-    if stoneNum >= 48:
-        limit = 7
-    else:
-        limit = 5 if len(moves) >= 12 else 6  # 6
+    limit = 10
 
     print(f"limit: {limit}")
 
+    args_list = []
+    for move in moves:
+        nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
+        args_list.append((nextBoard, -1, limit))
+
     # プールを作成
     with Pool() as pool:
-        evals = pool.starmap(
-            minLevel, [(board, move, limit, -1, alpha, beta) for move in moves]
-        )
+        evals = pool.starmap(evaluate_wrapper, args_list)
 
     maxEvalMove = float("-inf"), None
     for move, eval in zip(moves, evals):
@@ -59,6 +64,26 @@ def getAction(board, moves) -> List[int]:
     """
 
 
+evalCnt = 0
+
+
+def test(board, player, limit):
+    # アルファとベータの初期値
+    alpha = float("-inf")
+    beta = float("inf")
+
+    moves = OthelloLogic.getMoves(board, player, 8)
+    maxEvalMove = float("-inf"), None
+    for move in moves:
+        eval = minLevel(board, move, limit - 1, -player, alpha, beta)
+        # print(f"move: {move} eval: {eval}")
+        if eval > maxEvalMove[0]:
+            maxEvalMove = eval, move
+
+    print(f"evalCnt: {evalCnt}")
+    return maxEvalMove[0]
+
+
 def inactive_action(board, moves, player):
     """
     受け取ったmovesを戦略の優先度でソートしてに次のターンで相手にすべての石をひっくり返されない手を返す
@@ -77,6 +102,9 @@ def minLevel(board, move, limit, player, alpha, beta):
     nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
 
     if len(nextMoves) == 0 or limit == 0:
+        # evalCntをインクリメントする
+        global evalCnt
+        evalCnt += 1
         return Evaluate.evaluate_board(nextBoard, player)
 
     for nextMove in nextMoves:
@@ -92,6 +120,9 @@ def maxLevel(board, move, limit, player, alpha, beta):
     nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
 
     if len(nextMoves) == 0 or limit == 0:
+        # evalCntをインクリメントする
+        global evalCnt
+        evalCnt += 1
         return Evaluate.evaluate_board(nextBoard, player)
 
     for nextMove in nextMoves:

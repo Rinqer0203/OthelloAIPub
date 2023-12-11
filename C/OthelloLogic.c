@@ -12,7 +12,7 @@ bool executeFlip(int board[][BOARD_SIZE], int player, Vec2 action, Vec2 dir)
         return false;
     }
 
-    if (board[action.x + dir.x][action.y + dir.y] == -player)
+    if (board[action.y + dir.y][action.x + dir.x] == -player)
     {
         int tempX = action.x + dir.x;
         int tempY = action.y + dir.y;
@@ -27,17 +27,17 @@ bool executeFlip(int board[][BOARD_SIZE], int player, Vec2 action, Vec2 dir)
                 return false;
             }
 
-            if (board[tempX][tempY] == player)
+            if (board[tempY][tempX] == player)
             {
                 while (tempX != action.x || tempY != action.y)
                 {
                     tempX -= dir.x;
                     tempY -= dir.y;
-                    board[tempX][tempY] = player;
+                    board[tempY][tempX] = player;
                 }
                 return true;
             }
-            else if (board[tempX][tempY] == 0)
+            else if (board[tempY][tempX] == 0)
             {
                 return false;
             }
@@ -49,7 +49,7 @@ bool executeFlip(int board[][BOARD_SIZE], int player, Vec2 action, Vec2 dir)
 
 void execute(int board[][BOARD_SIZE], Vec2 action, int player)
 {
-    board[action.x][action.y] = player;
+    board[action.y][action.x] = player;
 
     for (int i = 0; i < 8; i++)
     {
@@ -128,7 +128,7 @@ int getMoves(int board[][BOARD_SIZE], Vec2 moves[MAX_MOVES], int player)
     return movesCount;
 }
 
-void PrintBoard(int board[][BOARD_SIZE])
+void PrintBoard2(int board[][BOARD_SIZE])
 {
     printf("board\n");
     for (int i = 0; i < BOARD_SIZE; i++)
@@ -136,6 +136,20 @@ void PrintBoard(int board[][BOARD_SIZE])
         printf("|");
         for (int j = 0; j < BOARD_SIZE; j++)
             printf("%2d|", board[i][j]);
+        printf("\n");
+    }
+}
+
+void PrintBoard(int board[][BOARD_SIZE])
+{
+    for (int y = 0; y < BOARD_SIZE; y++)
+    {
+        for (int x = 0; x < BOARD_SIZE; x++)
+        {
+            char *cell = board[y][x] == 1 ? "○ " : board[y][x] == -1 ? "● "
+                                                                     : "  ";
+            printf("%s", cell);
+        }
         printf("\n");
     }
 }

@@ -1,5 +1,6 @@
 import TestBoardProvider
 import OthelloLogic
+import OthelloAction
 import Evaluate
 import subprocess
 import ctypes
@@ -11,6 +12,8 @@ RESULT_FILE_NAME = "OthelloAction"
 COMPILE_COMMAND = rf"gcc {FILE_NAMES} -shared -O2 -o {RESULT_FILE_NAME}.dll"
 
 MOVES_MAX_LENGTH = 60  # movesの最大長
+
+isCompiled = False
 
 
 class CModule:
@@ -64,11 +67,14 @@ class CModule:
         return self.dll.evaluate(board_array, player, limit)
 
 
-def generate_c_module() -> ctypes.WinDLL:
+def generate_c_module() -> CModule:
     """
     dllをロードしてインスタンス生成
+    global isCompiled
+    if isCompiled is False:
+        __compile_c()
+        isCompiled = True
     """
-    __compile_c()
     return CModule(__load_dll())
 
 
@@ -107,21 +113,28 @@ def check_move():
     print(OthelloLogic.getMoves(board, player, 8))
 
 
-def test_evaluate(cModule, board, player):
-    eval = cModule.evaluate(board, player, 3)
-    print(f"C eval: {eval}")
-    eval = Evaluate.evaluate_board(board, player)
-    print(f"python eval: {eval}")
+def benchmark_minimax(cModule, board, limit):
+    start_time = time.time()
+    eval = cModule.evaluate(board, 1, limit)
+    end_time = time.time()
+    print(f"C eval: {eval} 処理時間: {end_time - start_time}s")
+
+    start_time = time.time()
+    eval = OthelloAction.test(board, 1, limit)
+    end_time = time.time()
+    print(f"python eval: {eval} 処理時間: {end_time - start_time}s")
 
 
 if __name__ == "__main__":
+    cModule = generate_c_module()
+    board = TestBoardProvider.generate_initial_board()
+    moves = OthelloLogic.getMoves(board, 1, 8)
+    player = 1
+
+    move = OthelloAction.getAction(board, moves)
+    print(move)
+
     # benchmark()
     # check_move()
-    cModule = generate_c_module()
-    board = TestBoardProvider.generate_board3()
-    player = -1
-
-    test_evaluate(cModule, TestBoardProvider.generate_board3(), player)
-    test_evaluate(cModule, TestBoardProvider.generate_board2(), player)
-    test_evaluate(cModule, TestBoardProvider.generate_board1(), player)
-    test_evaluate(cModule, TestBoardProvider.generate_evaluate_board1(), player)
+    # test_evaluates(cModule, player)
+    # benchmark_minimax(cModule, board, 4)
