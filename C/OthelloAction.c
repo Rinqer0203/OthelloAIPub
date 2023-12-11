@@ -78,7 +78,7 @@ float evaluate(int board[][BOARD_SIZE], int player, int limit)
         // printf("move %d %d : nextBoard\n", move.x, move.y);
         // PrintBoard(nextBoard);
 
-        float value = minLevel(nextBoard, limit - 1, -player, alpha, beta);
+        float value = minLevel(nextBoard, limit - 1, player, alpha, beta);
         maxValue = fmax(maxValue, value);
 
         alpha = fmax(alpha, value);

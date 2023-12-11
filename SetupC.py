@@ -26,6 +26,14 @@ class CModule:
         )
         self.dll.Action.restype = ctypes.POINTER(ctypes.c_int * 2)
         self.dll.evaluate.restype = ctypes.c_float
+        self.dll.minLevel.restype = ctypes.c_float
+        self.dll.minLevel.argtypes = [
+            ctypes.POINTER((ctypes.c_int * 8) * 8),  # ボード配列の型
+            ctypes.c_int,  # limit
+            ctypes.c_int,  # player
+            ctypes.c_float,  # alpha
+            ctypes.c_float,  # beta
+        ]
 
     def __convert_2d_array(self, c_type, data):
         """
@@ -65,6 +73,10 @@ class CModule:
     def evaluate(self, board, player, limit):
         board_array = self.__convert_2d_array(ctypes.c_int, board)
         return self.dll.evaluate(board_array, player, limit)
+
+    def minLevel(self, board, limit, player, alpha, beta):
+        board_array = self.__convert_2d_array(ctypes.c_int, board)
+        return self.dll.minLevel(board_array, limit, player, alpha, beta)
 
 
 def generate_c_module() -> CModule:
@@ -128,12 +140,12 @@ def benchmark_minimax(cModule, board, limit):
 if __name__ == "__main__":
     compile_c()
     cModule = generate_c_module()
-    board = TestBoardProvider.generate_board3()
+    board = TestBoardProvider.generate_board2()
     moves = OthelloLogic.getMoves(board, 1, 8)
     player = 1
 
     # benchmark()
     # check_move()
     # test_evaluates(cModule, player)
-    benchmark_minimax(cModule, board, 5)
-    OthelloAction.getAction(board, moves)
+    # benchmark_minimax(cModule, board, 5)
+    OthelloAction.test2(board, 4)

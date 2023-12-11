@@ -17,26 +17,33 @@ def getAction(board, moves) -> List[int]:
     print("=====================================")
     print(f"len : {len(moves)} moves: {moves}")
 
-    if check_active_mode(board) is False and False:
-        # 30ターン経過していない場合は最弱モード
-        return inactive_action(board, moves, 1)
-
     # 処理時間計測開始
     start_time = time.time()
+
+    # アルファとベータの初期値
+    alpha = float("-inf")
+    beta = float("inf")
 
     # 探索の深さを決定
     stoneNum = count_stone(board)
     print(f"stoneNum: {stoneNum}")
-    limit = 6
+    limit = 0
+    if stoneNum >= 48:
+        limit = 7
+    else:
+        limit = 5 if len(moves) >= 12 else 6  # 6
 
     print(f"limit: {limit}")
 
-    cModule = SetupC.generate_c_module()
+    # プールを作成
+    with Pool() as pool:
+        evals = pool.starmap(
+            minLevel, [(board, move, limit - 1, -1, alpha, beta) for move in moves]
+        )
+
     maxEvalMove = float("-inf"), None
-    for move in moves:
-        nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
-        OthelloLogic.printBoard(nextBoard)
-        eval = cModule.evaluate(nextBoard, -1, limit)
+    for move, eval in zip(moves, evals):
+        print(f"move: {move} eval: {eval}")
         if eval > maxEvalMove[0]:
             maxEvalMove = eval, move
 
@@ -45,17 +52,59 @@ def getAction(board, moves) -> List[int]:
     print(f"処理時間: {end_time - start_time}s")
     return maxEvalMove[1]
 
-    """
-    #並列化しない場合
+
+def getAction2(board, moves) -> List[int]:
+    print("=====================================")
+    print(f"len : {len(moves)} moves: {moves}")
+
+    # 処理時間計測開始
+    start_time = time.time()
+
+    # アルファとベータの初期値
+    alpha = float("-inf")
+    beta = float("inf")
+
+    # 探索の深さを決定
+    stoneNum = count_stone(board)
+    print(f"stoneNum: {stoneNum}")
+    limit = 0
+    if stoneNum >= 48:
+        limit = 7
+    else:
+        limit = 5 if len(moves) >= 12 else 6  # 6
+
+    print(f"limit: {limit}")
+
     maxEvalMove = float("-inf"), None
+
+    cModule = SetupC.generate_c_module()
     for move in moves:
-        eval = minLevel(board, move, limit, -1, alpha, beta)
+        nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
+        eval = cModule.minLevel(nextBoard, limit - 1, -1, alpha, beta)
+        print(f"move: {move} eval: {eval}")
         if eval > maxEvalMove[0]:
             maxEvalMove = eval, move
-    """
+
+    end_time = time.time()
+    print(f"決定した手: {maxEvalMove[1]} 評価値: {maxEvalMove[0]}")
+    print(f"処理時間: {end_time - start_time}s")
+    return maxEvalMove[1]
 
 
 evalCnt = 0
+
+
+def test2(board, limit):
+    moves = OthelloLogic.getMoves(board, 1, 8)
+    move = moves[0]
+
+    eval = minLevel(board, move, limit - 1, -1, float("-inf"), float("inf"))
+    print(f"python eval: {eval}")
+
+    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
+    cModule = SetupC.generate_c_module()
+    eval = cModule.minLevel(nextBoard, limit - 1, -1, float("-inf"), float("inf"))
+    print(f"C eval: {eval}")
 
 
 def test(board, player, limit):
