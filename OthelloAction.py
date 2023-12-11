@@ -8,11 +8,6 @@ from multiprocessing import Pool
 from typing import List
 
 
-def evaluate_wrapper(board, player, limit):
-    cModule = SetupC.generate_c_module()
-    return cModule.evaluate(board, player, limit)
-
-
 def getAction(board, moves) -> List[int]:
     print("=====================================")
     print(f"len : {len(moves)} moves: {moves}")
@@ -32,46 +27,7 @@ def getAction(board, moves) -> List[int]:
         limit = 7
     else:
         limit = 5 if len(moves) >= 12 else 6  # 6
-
-    print(f"limit: {limit}")
-
-    # プールを作成
-    with Pool() as pool:
-        evals = pool.starmap(
-            minLevel, [(board, move, limit - 1, -1, alpha, beta) for move in moves]
-        )
-
-    maxEvalMove = float("-inf"), None
-    for move, eval in zip(moves, evals):
-        print(f"move: {move} eval: {eval}")
-        if eval > maxEvalMove[0]:
-            maxEvalMove = eval, move
-
-    end_time = time.time()
-    print(f"決定した手: {maxEvalMove[1]} 評価値: {maxEvalMove[0]}")
-    print(f"処理時間: {end_time - start_time}s")
-    return maxEvalMove[1]
-
-
-def getAction2(board, moves) -> List[int]:
-    print("=====================================")
-    print(f"len : {len(moves)} moves: {moves}")
-
-    # 処理時間計測開始
-    start_time = time.time()
-
-    # アルファとベータの初期値
-    alpha = float("-inf")
-    beta = float("inf")
-
-    # 探索の深さを決定
-    stoneNum = count_stone(board)
-    print(f"stoneNum: {stoneNum}")
-    limit = 0
-    if stoneNum >= 48:
-        limit = 7
-    else:
-        limit = 5 if len(moves) >= 12 else 6  # 6
+    limit = 8
 
     print(f"limit: {limit}")
 
@@ -89,39 +45,6 @@ def getAction2(board, moves) -> List[int]:
     print(f"決定した手: {maxEvalMove[1]} 評価値: {maxEvalMove[0]}")
     print(f"処理時間: {end_time - start_time}s")
     return maxEvalMove[1]
-
-
-evalCnt = 0
-
-
-def test2(board, limit):
-    moves = OthelloLogic.getMoves(board, 1, 8)
-    move = moves[0]
-
-    eval = minLevel(board, move, limit - 1, -1, float("-inf"), float("inf"))
-    print(f"python eval: {eval}")
-
-    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
-    cModule = SetupC.generate_c_module()
-    eval = cModule.minLevel(nextBoard, limit - 1, -1, float("-inf"), float("inf"))
-    print(f"C eval: {eval}")
-
-
-def test(board, player, limit):
-    # アルファとベータの初期値
-    alpha = float("-inf")
-    beta = float("inf")
-
-    moves = OthelloLogic.getMoves(board, player, 8)
-    maxEvalMove = float("-inf"), None
-    for move in moves:
-        eval = minLevel(board, move, limit - 1, -player, alpha, beta)
-        # print(f"move: {move} eval: {eval}")
-        if eval > maxEvalMove[0]:
-            maxEvalMove = eval, move
-
-    print(f"evalCnt: {evalCnt}")
-    return maxEvalMove[0]
 
 
 def inactive_action(board, moves, player):
@@ -191,6 +114,36 @@ def count_stone(board):
             if board[x][y] != 0:
                 stoneCnt += 1
     return stoneCnt
+
+
+def test2(board, limit):
+    moves = OthelloLogic.getMoves(board, 1, 8)
+    move = moves[0]
+
+    eval = minLevel(board, move, limit - 1, -1, float("-inf"), float("inf"))
+    print(f"python eval: {eval}")
+
+    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
+    cModule = SetupC.generate_c_module()
+    eval = cModule.minLevel(nextBoard, limit - 1, -1, float("-inf"), float("inf"))
+    print(f"C eval: {eval}")
+
+
+def test(board, player, limit):
+    # アルファとベータの初期値
+    alpha = float("-inf")
+    beta = float("inf")
+
+    moves = OthelloLogic.getMoves(board, player, 8)
+    maxEvalMove = float("-inf"), None
+    for move in moves:
+        eval = minLevel(board, move, limit - 1, -player, alpha, beta)
+        # print(f"move: {move} eval: {eval}")
+        if eval > maxEvalMove[0]:
+            maxEvalMove = eval, move
+
+    print(f"evalCnt: {evalCnt}")
+    return maxEvalMove[0]
 
 
 def debug_print(move, limit, player, nextBoard, nextMoves):
