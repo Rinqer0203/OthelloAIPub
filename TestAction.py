@@ -14,18 +14,9 @@ def __Test(board, testName):
     print("\n")
 
 
-def __Test2(board, testName):
-    print(f"------ {testName} ------")
-    moves = OthelloLogic.getMoves(board, 1, 8)
-    resultMove = OthelloAction.getAction(board, moves)
-    print("\n")
-
-    resultMove = OthelloAction.getAction2(board, moves)
-
-
 if __name__ == "__main__":
     # __Test2(TestBoardProvider.generate_initial_board(), "initial board test")
-    __Test2(TestBoardProvider.generate_board2(), "board1 test")
+    __Test(TestBoardProvider.generate_board2(), "board1 test")
     # __Test(TestBoardProvider.generate_board2(), "board1 test")
     # __Test(TestBoardProvider.generate_inactive_board1(), "inactive board1 test")
     # __Test(TestBoardProvider.generate_inactive_board2(), "generate_inactive_board2")
