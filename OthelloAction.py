@@ -8,6 +8,14 @@ from multiprocessing import Pool
 from typing import List
 
 
+def eval_move(args):
+    board, move, limit, alpha, beta = args
+    cModule = SetupC.generate_c_module()
+    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
+    eval = cModule.minLevel(nextBoard, limit - 1, -1, alpha, beta)
+    return eval, move
+
+
 def getAction(board, moves) -> List[int]:
     print("=====================================")
     print(f"len : {len(moves)} moves: {moves}")
@@ -33,11 +41,13 @@ def getAction(board, moves) -> List[int]:
 
     maxEvalMove = float("-inf"), None
 
-    cModule = SetupC.generate_c_module()
-    for move in moves:
-        nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
-        eval = cModule.minLevel(nextBoard, limit - 1, -1, alpha, beta)
-        print(f"move: {move} eval: {eval}")
+    pool = Pool()
+    args = [(board, move, limit, alpha, beta) for move in moves]
+    results = pool.map(eval_move, args)
+    pool.close()
+    pool.join()
+
+    for eval, move in results:
         if eval > maxEvalMove[0]:
             maxEvalMove = eval, move
 
