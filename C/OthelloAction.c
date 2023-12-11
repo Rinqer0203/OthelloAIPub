@@ -81,12 +81,12 @@ float evaluate(int board[][BOARD_SIZE], int player, int limit)
         float value = minLevel(nextBoard, limit - 1, -player, alpha, beta);
         maxValue = fmax(maxValue, value);
 
-        // alpha = fmax(alpha, value);
-        // if (beta <= alpha)
-        //     break; // アルファベータ枝刈り
+        alpha = fmax(alpha, value);
+        if (beta <= alpha)
+            break; // アルファベータ枝刈り
     }
 
-    printf("evalCnt: %d\n", evalCnt);
+    // printf("evalCnt: %d\n", evalCnt);
     return maxValue;
 }
 

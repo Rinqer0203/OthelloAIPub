@@ -24,28 +24,19 @@ def getAction(board, moves) -> List[int]:
     # 処理時間計測開始
     start_time = time.time()
 
-    # アルファとベータの初期値
-    alpha = float("-inf")
-    beta = float("inf")
-
     # 探索の深さを決定
     stoneNum = count_stone(board)
     print(f"stoneNum: {stoneNum}")
-    limit = 10
+    limit = 6
 
     print(f"limit: {limit}")
 
-    args_list = []
+    cModule = SetupC.generate_c_module()
+    maxEvalMove = float("-inf"), None
     for move in moves:
         nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
-        args_list.append((nextBoard, -1, limit))
-
-    # プールを作成
-    with Pool() as pool:
-        evals = pool.starmap(evaluate_wrapper, args_list)
-
-    maxEvalMove = float("-inf"), None
-    for move, eval in zip(moves, evals):
+        OthelloLogic.printBoard(nextBoard)
+        eval = cModule.evaluate(nextBoard, -1, limit)
         if eval > maxEvalMove[0]:
             maxEvalMove = eval, move
 

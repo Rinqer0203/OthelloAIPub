@@ -78,7 +78,7 @@ def generate_c_module() -> CModule:
     return CModule(__load_dll())
 
 
-def __compile_c():
+def compile_c():
     subprocess.run(COMPILE_COMMAND, check=True)
 
 
@@ -115,26 +115,25 @@ def check_move():
 
 def benchmark_minimax(cModule, board, limit):
     start_time = time.time()
-    eval = cModule.evaluate(board, 1, limit)
+    eval = cModule.evaluate(board, -1, limit)
     end_time = time.time()
     print(f"C eval: {eval} 処理時間: {end_time - start_time}s")
 
     start_time = time.time()
-    eval = OthelloAction.test(board, 1, limit)
+    eval = OthelloAction.test(board, -1, limit)
     end_time = time.time()
     print(f"python eval: {eval} 処理時間: {end_time - start_time}s")
 
 
 if __name__ == "__main__":
+    compile_c()
     cModule = generate_c_module()
-    board = TestBoardProvider.generate_initial_board()
+    board = TestBoardProvider.generate_board3()
     moves = OthelloLogic.getMoves(board, 1, 8)
     player = 1
-
-    move = OthelloAction.getAction(board, moves)
-    print(move)
 
     # benchmark()
     # check_move()
     # test_evaluates(cModule, player)
-    # benchmark_minimax(cModule, board, 4)
+    benchmark_minimax(cModule, board, 5)
+    OthelloAction.getAction(board, moves)
