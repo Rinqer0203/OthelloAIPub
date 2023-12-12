@@ -3,9 +3,11 @@ import OthelloLogic
 import EnemyOthelloAction
 import TestBoardProvider
 import copy
+import SetupC
 import random
 
 if __name__ == "__main__":
+    SetupC.compile_c()
     board = TestBoardProvider.generate_initial_board()
     player = 1
     turnCnt = 1

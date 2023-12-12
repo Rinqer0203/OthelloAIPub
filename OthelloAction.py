@@ -33,8 +33,11 @@ def getAction(board, moves) -> List[int]:
         limit = 7
     else:
         limit = 5 if len(moves) >= 12 else 6  # 6
-    limit = 5
+    limit = 6
 
+    if count_void_cell(board) <= 15:
+        limit = 100
+        print(f"完全よみ void cell : {count_void_cell(board)}")
     print(f"limit: {limit}")
 
     maxEvalMove = float("-inf"), None
@@ -122,6 +125,18 @@ def count_stone(board):
             if board[x][y] != 0:
                 stoneCnt += 1
     return stoneCnt
+
+
+def count_void_cell(board):
+    """
+    空きマスの数をカウントして返す
+    """
+    voidCellCnt = 0
+    for x in range(len(board)):
+        for y in range(len(board)):
+            if board[x][y] == 0:
+                voidCellCnt += 1
+    return voidCellCnt
 
 
 def test2(board, limit):

@@ -33,7 +33,7 @@ def getAction(board, moves) -> List[int]:
         limit = 7
     else:
         limit = 5 if len(moves) >= 12 else 6  # 6
-    limit = 6
+    limit = 7
 
     print(f"limit: {limit}")
 
