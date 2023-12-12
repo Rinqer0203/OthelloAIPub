@@ -111,6 +111,17 @@ def check_move():
     print(OthelloLogic.getMoves(board, player, 8))
 
 
+def check_evaluates():
+    OthelloAction.test2(TestBoardProvider.generate_initial_board(), 4)
+    OthelloAction.test2(TestBoardProvider.generate_board1(), 4)
+    OthelloAction.test2(TestBoardProvider.generate_board2(), 4)
+    OthelloAction.test2(TestBoardProvider.generate_board3(), 4)
+    OthelloAction.test2(TestBoardProvider.generate_board4(), 4)
+    OthelloAction.test2(TestBoardProvider.generate_inactive_board1(), 4)
+    OthelloAction.test2(TestBoardProvider.generate_inactive_board2(), 4)
+    OthelloAction.test2(TestBoardProvider.generate_evaluate_board1(), 4)
+
+
 def benchmark_minimax(cModule, board, limit):
     start_time = time.time()
     eval = cModule.evaluate(board, -1, limit)
@@ -123,15 +134,31 @@ def benchmark_minimax(cModule, board, limit):
     print(f"python eval: {eval} 処理時間: {end_time - start_time}s")
 
 
+def benchmark_minimax2(cModule, board, limit):
+    start_time = time.time()
+    eval = cModule.minLevelWrapper(board, limit, -1)
+    end_time = time.time()
+    print(f"処理時間: {end_time - start_time}s")
+
+
 if __name__ == "__main__":
     compile_c()
     cModule = generate_c_module()
     board = TestBoardProvider.generate_evaluate_board1()
     moves = OthelloLogic.getMoves(board, 1, 8)
     player = 1
+    limit = 10
+
+    benchmark_minimax2(cModule, TestBoardProvider.generate_initial_board(), limit)
+    benchmark_minimax2(cModule, TestBoardProvider.generate_board1(), limit)
+    benchmark_minimax2(cModule, TestBoardProvider.generate_board2(), limit)
+    benchmark_minimax2(cModule, TestBoardProvider.generate_board3(), limit)
+    benchmark_minimax2(cModule, TestBoardProvider.generate_board4(), limit)
+    benchmark_minimax2(cModule, TestBoardProvider.generate_inactive_board1(), limit)
+    benchmark_minimax2(cModule, TestBoardProvider.generate_inactive_board2(), limit)
+    benchmark_minimax2(cModule, TestBoardProvider.generate_evaluate_board1(), limit)
 
     # benchmark()
     # check_move()
     # test_evaluates(cModule, player)
     # benchmark_minimax(cModule, board, 5)
-    OthelloAction.test2(board, 4)

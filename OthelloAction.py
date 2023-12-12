@@ -129,13 +129,18 @@ def test2(board, limit):
     moves = OthelloLogic.getMoves(board, 1, 8)
     move = moves[0]
 
-    eval = minLevel(board, move, limit - 1, -1, float("-inf"), float("inf"))
-    print(f"python eval: {eval}")
+    pyEval = minLevel(board, move, limit - 1, -1, float("-inf"), float("inf"))
+    print(f"python eval: {pyEval}")
 
     nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
     cModule = SetupC.generate_c_module()
-    eval = cModule.minLevelWrapper(nextBoard, limit - 1, -1)
-    print(f"C eval: {eval}")
+    cEval = cModule.minLevelWrapper(nextBoard, limit - 1, -1)
+    print(f"C eval: {cEval}")
+    # pyeval と cevalの値が小数点第二位まで一致しているか確認する
+    if round(pyEval, 2) == round(cEval, 2):
+        print("OK")
+    else:
+        print("一致していない!!!!!!!!!!")
 
 
 def test(board, player, limit):
