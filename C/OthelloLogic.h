@@ -12,6 +12,11 @@ typedef struct
     int y;
 } Vec2;
 
+const Vec2 leftUpAround[3];
+const Vec2 rightUpAround[3];
+const Vec2 leftDownAround[3];
+const Vec2 rightDownAround[3];
+
 void execute(int board[][BOARD_SIZE], Vec2 move, int player);
 int getMoves(int board[][BOARD_SIZE], Vec2 moves[MAX_MOVES], int player);
 void PrintBoard(int board[][BOARD_SIZE]);

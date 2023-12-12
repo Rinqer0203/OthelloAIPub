@@ -5,6 +5,7 @@
 #include <math.h>
 #include "OthelloLogic.h"
 #include "ActiveEvaluate.h"
+#include "InactiveEvaluate.h"
 
 float minLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, float beta);
 float maxLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, float beta);
@@ -57,7 +58,7 @@ float minLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, floa
     if (limit == 0 || moveLen == 0)
     {
         evalCnt++;
-        return evaluateBoard(board);
+        return evaluateBoardInactive(board);
     }
 
     float minValue = FLT_MAX;
@@ -87,7 +88,7 @@ float maxLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, floa
     if (limit == 0 || moveLen == 0)
     {
         evalCnt++;
-        return evaluateBoard(board);
+        return evaluateBoardInactive(board);
     }
 
     float maxValue = -FLT_MAX;

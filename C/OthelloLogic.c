@@ -4,6 +4,11 @@
 
 const Vec2 DIRS[8] = {{-1, -1}, {0, -1}, {1, -1}, {-1, 0}, {1, 0}, {-1, 1}, {0, 1}, {1, 1}};
 
+const Vec2 leftUpAround[3] = {{0, 1}, {1, 0}, {1, 1}};
+const Vec2 rightUpAround[3] = {{0, 6}, {1, 6}, {1, 7}};
+const Vec2 leftDownAround[3] = {{6, 0}, {6, 1}, {7, 1}};
+const Vec2 rightDownAround[3] = {{6, 6}, {6, 7}, {7, 6}};
+
 bool executeFlip(int board[][BOARD_SIZE], int player, Vec2 action, Vec2 dir)
 {
 
