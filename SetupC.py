@@ -7,9 +7,7 @@ import ctypes
 import time
 from typing import List
 
-FILE_NAMES = (
-    r"C\OthelloAction.c C\OthelloLogic.c C\ActiveEvaluate.c C\InactiveEvaluate.c"
-)
+FILE_NAMES = r"C\OthelloAction.c C\OthelloLogic.c C\ActiveEvaluate.c"
 RESULT_FILE_NAME = "OthelloAction"
 ENEMY_FILE_NAME = "EnemyOthelloAction"
 COMPILE_COMMAND = rf"gcc {FILE_NAMES} -shared -O2 -o {RESULT_FILE_NAME}.dll"
