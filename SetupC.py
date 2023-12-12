@@ -141,12 +141,8 @@ def benchmark_minimax2(cModule, board, limit):
     print(f"処理時間: {end_time - start_time}s")
 
 
-if __name__ == "__main__":
-    compile_c()
+def benchmark_minimax2_exe():
     cModule = generate_c_module()
-    board = TestBoardProvider.generate_evaluate_board1()
-    moves = OthelloLogic.getMoves(board, 1, 8)
-    player = 1
     limit = 10
 
     benchmark_minimax2(cModule, TestBoardProvider.generate_initial_board(), limit)
@@ -157,6 +153,12 @@ if __name__ == "__main__":
     benchmark_minimax2(cModule, TestBoardProvider.generate_inactive_board1(), limit)
     benchmark_minimax2(cModule, TestBoardProvider.generate_inactive_board2(), limit)
     benchmark_minimax2(cModule, TestBoardProvider.generate_evaluate_board1(), limit)
+
+
+if __name__ == "__main__":
+    compile_c()
+
+    benchmark_minimax2_exe()
 
     # benchmark()
     # check_move()
