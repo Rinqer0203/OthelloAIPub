@@ -1,6 +1,8 @@
 import OthelloAction
 import OthelloLogic
+import EnemyOthelloAction
 import TestBoardProvider
+import copy
 import random
 
 if __name__ == "__main__":
@@ -24,12 +26,13 @@ if __name__ == "__main__":
                 continue
 
         if player == 1:
-            action = OthelloAction.getAction(
-                board, OthelloLogic.getMoves(board, player, 8)
-            )
+            action = OthelloAction.getAction(board, moves)
         else:
-            action = moves[random.randrange(len(moves))]
-            print(f"ランダムで手を決定 : {action}")
+            # action = moves[random.randrange(len(moves))]
+            action = EnemyOthelloAction.getAction(
+                OthelloLogic.getReverseboard(copy.deepcopy(board)), moves
+            )
+            # print(f"ランダムで手を決定 : {action}")
 
         board = OthelloLogic.execute(board, action, player, 8)
         OthelloLogic.printBoardWithCell(board, player, [-1, -1], 8)
@@ -49,3 +52,6 @@ if __name__ == "__main__":
         print("player -1の勝ち")
     else:
         print("引き分け")
+
+    print(f"player 1の石の数: {playerOneStoneCnt}")
+    print(f"player -1の石の数: {playerMinusStoneCnt}")

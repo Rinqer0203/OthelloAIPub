@@ -12,7 +12,7 @@ evalCnt = 0
 
 def eval_move(args):
     board, move, limit = args
-    cModule = SetupC.generate_c_module()
+    cModule = SetupC.generate_enemy_c_module()
     nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
     eval = cModule.minLevelWrapper(nextBoard, limit - 1, -1)
     return eval, move
@@ -33,7 +33,7 @@ def getAction(board, moves) -> List[int]:
         limit = 7
     else:
         limit = 5 if len(moves) >= 12 else 6  # 6
-    limit = 5
+    limit = 6
 
     print(f"limit: {limit}")
 
@@ -66,42 +66,6 @@ def inactive_action(board, moves, player):
             return move
     print("相手にすべての石をひっくり返される手しかないので最初の要素を返します")
     return sortedMoves[0]
-
-
-def minLevel(board, move, limit, player, alpha, beta):
-    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, 8)
-    nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
-
-    if len(nextMoves) == 0 or limit == 0:
-        # evalCntをインクリメントする
-        global evalCnt
-        evalCnt += 1
-        return Evaluate.evaluate_board(nextBoard, player)
-
-    for nextMove in nextMoves:
-        eval = maxLevel(nextBoard, nextMove, limit - 1, -player, alpha, beta)
-        beta = min(beta, eval)
-        if beta <= alpha:
-            break  # アルファカットオフ
-    return beta
-
-
-def maxLevel(board, move, limit, player, alpha, beta):
-    nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, -player, 8)
-    nextMoves = OthelloLogic.getMoves(nextBoard, player, 8)
-
-    if len(nextMoves) == 0 or limit == 0:
-        # evalCntをインクリメントする
-        global evalCnt
-        evalCnt += 1
-        return Evaluate.evaluate_board(nextBoard, player)
-
-    for nextMove in nextMoves:
-        eval = minLevel(nextBoard, nextMove, limit - 1, -player, alpha, beta)
-        alpha = max(alpha, eval)
-        if alpha >= beta:
-            break  # ベータカットオフ
-    return alpha
 
 
 def check_active_mode(board):

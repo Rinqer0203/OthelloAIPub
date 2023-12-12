@@ -9,6 +9,7 @@ from typing import List
 
 FILE_NAMES = r"C\OthelloAction.c C\OthelloLogic.c C\ActiveEvaluate.c"
 RESULT_FILE_NAME = "OthelloAction"
+ENEMY_FILE_NAME = "EnemyOthelloAction"
 COMPILE_COMMAND = rf"gcc {FILE_NAMES} -shared -O2 -o {RESULT_FILE_NAME}.dll"
 
 MOVES_MAX_LENGTH = 60  # movesの最大長
@@ -68,20 +69,20 @@ class CModule:
 def generate_c_module() -> CModule:
     """
     dllをロードしてインスタンス生成
-    global isCompiled
-    if isCompiled is False:
-        __compile_c()
-        isCompiled = True
     """
-    return CModule(__load_dll())
+    return CModule(__load_dll(RESULT_FILE_NAME))
+
+
+def generate_enemy_c_module() -> CModule:
+    return CModule(__load_dll(ENEMY_FILE_NAME))
 
 
 def compile_c():
     subprocess.run(COMPILE_COMMAND, check=True)
 
 
-def __load_dll() -> ctypes.WinDLL:
-    return ctypes.WinDLL(rf".\{RESULT_FILE_NAME}.dll")
+def __load_dll(fileName) -> ctypes.WinDLL:
+    return ctypes.WinDLL(rf".\{fileName}.dll")
 
 
 def benchmark():
@@ -142,7 +143,7 @@ def benchmark_minimax2(cModule, board, limit):
 
 
 def benchmark_minimax2_exe():
-    cModule = generate_c_module()
+    cModule = generate_enemy_c_module()
     limit = 10
 
     benchmark_minimax2(cModule, TestBoardProvider.generate_initial_board(), limit)

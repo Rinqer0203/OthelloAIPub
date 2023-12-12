@@ -85,7 +85,10 @@ float maxLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, floa
     int moveLen = getMoves(board, moves, player);
 
     if (limit == 0 || moveLen == 0)
+    {
+        evalCnt++;
         return evaluateBoard(board);
+    }
 
     float maxValue = -FLT_MAX;
     for (int i = 0; i < moveLen; i++)
