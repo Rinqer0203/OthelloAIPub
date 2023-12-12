@@ -5,8 +5,6 @@
 #include <math.h>
 #include "OthelloLogic.h"
 
-static int result[2];
-
 float minLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, float beta);
 float maxLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, float beta);
 float evaluateBoard(int board[][BOARD_SIZE], int player);
@@ -15,26 +13,9 @@ float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE], int player);
 float evaluateBase(int board[BOARD_SIZE][BOARD_SIZE], int player);
 void copyBoard(int src[][BOARD_SIZE], int dest[][BOARD_SIZE]);
 
-void convertIntMovesToVec2(int src[][2], Vec2 dest[], int movesLength)
-{
-    for (int i = 0; i < movesLength; i++)
-    {
-        dest[i].x = src[i][0];
-        dest[i].y = src[i][1];
-    }
-}
+int evalCnt = 0;
 
-int *Action(int board[][BOARD_SIZE], int moves[][2], int movesLength)
-{
-    printf("%d\n", movesLength);
-    PrintBoard(board);
-
-    // 配列を初期化
-    result[0] = 4;
-    result[1] = 5;
-    return result;
-}
-
+// pythonから呼び出されるgetMoves関数
 int (*getMovesC(int board[][BOARD_SIZE], int player))[2]
 {
     static int staticMoves[MAX_MOVES + 1][2]; // +1 to include the end marker
@@ -54,51 +35,14 @@ int (*getMovesC(int board[][BOARD_SIZE], int player))[2]
     return staticMoves;
 }
 
-int evalCnt = 0;
-
-float evaluate(int board[][BOARD_SIZE], int player, int limit)
+// pythonから呼び出されるミニマックス法のminLevelラッパー関数
+float minLevelWrapper(int board[][BOARD_SIZE], int limit, int player)
 {
     evalCnt = 0;
-    Vec2 moves[MAX_MOVES];
-    int moveLen = getMoves(board, moves, player);
-
-    if (moveLen == 0)
-        return evaluateBoard(board, player);
-
-    float alpha = -FLT_MAX;
-    float beta = FLT_MAX;
-    float maxValue = -FLT_MAX;
-
-    for (int i = 0; i < moveLen; i++)
-    {
-        Vec2 move = moves[i];
-        int nextBoard[BOARD_SIZE][BOARD_SIZE];
-        copyBoard(board, nextBoard);
-        execute(nextBoard, move, player);
-        // printf("move %d %d : nextBoard\n", move.x, move.y);
-        // PrintBoard(nextBoard);
-
-        float value = minLevel(nextBoard, limit - 1, player, alpha, beta);
-        maxValue = fmax(maxValue, value);
-
-        alpha = fmax(alpha, value);
-        if (beta <= alpha)
-            break; // アルファベータ枝刈り
-    }
-
-    // printf("evalCnt: %d\n", evalCnt);
-    return maxValue;
+    return minLevel(board, limit, player, -FLT_MAX, FLT_MAX);
 }
 
 //--------------------------------------------------
-
-float evaluateBoard(int board[][BOARD_SIZE], int player)
-{
-    evalCnt++;
-    float stoneCount = evaluateStoneCount(board, player);
-    float base = evaluateBase(board, player);
-    return (stoneCount + base) * player;
-}
 
 void copyBoard(int src[][BOARD_SIZE], int dest[][BOARD_SIZE])
 {
@@ -160,7 +104,15 @@ float maxLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, floa
     return maxValue;
 }
 
-int baseBoardPoint[BOARD_SIZE][BOARD_SIZE] = {
+float evaluateBoard(int board[][BOARD_SIZE], int player)
+{
+    evalCnt++;
+    float stoneCount = evaluateStoneCount(board, player);
+    float base = evaluateBase(board, player);
+    return (stoneCount + base) * player;
+}
+
+const int baseBoardPoint[BOARD_SIZE][BOARD_SIZE] = {
     {30, -12, 0, -1, -1, 0, -12, 30},
     {-12, -15, -3, -3, -3, -3, -15, -12},
     {0, -3, 0, -1, -1, 0, -3, 0},
@@ -170,10 +122,10 @@ int baseBoardPoint[BOARD_SIZE][BOARD_SIZE] = {
     {-12, -15, -3, -3, -3, -3, -15, -12},
     {30, -12, 0, -1, -1, 0, -12, 30}};
 
-Vec2 leftUpAround[3] = {{0, 1}, {1, 0}, {1, 1}};
-Vec2 rightUpAround[3] = {{0, 6}, {1, 6}, {1, 7}};
-Vec2 leftDownAround[3] = {{6, 0}, {6, 1}, {7, 1}};
-Vec2 rightDownAround[3] = {{6, 6}, {6, 7}, {7, 6}};
+const Vec2 leftUpAround[3] = {{0, 1}, {1, 0}, {1, 1}};
+const Vec2 rightUpAround[3] = {{0, 6}, {1, 6}, {1, 7}};
+const Vec2 leftDownAround[3] = {{6, 0}, {6, 1}, {7, 1}};
+const Vec2 rightDownAround[3] = {{6, 6}, {6, 7}, {7, 6}};
 
 bool isSpecialCornerAround(int x, int y, int board[BOARD_SIZE][BOARD_SIZE], int player)
 {

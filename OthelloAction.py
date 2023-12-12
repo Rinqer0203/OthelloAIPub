@@ -7,12 +7,14 @@ import SetupC
 from multiprocessing import Pool
 from typing import List
 
+evalCnt = 0
+
 
 def eval_move(args):
-    board, move, limit, alpha, beta = args
+    board, move, limit = args
     cModule = SetupC.generate_c_module()
     nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
-    eval = cModule.minLevel(nextBoard, limit - 1, -1, alpha, beta)
+    eval = cModule.minLevelWrapper(nextBoard, limit - 1, -1)
     return eval, move
 
 
@@ -22,10 +24,6 @@ def getAction(board, moves) -> List[int]:
 
     # 処理時間計測開始
     start_time = time.time()
-
-    # アルファとベータの初期値
-    alpha = float("-inf")
-    beta = float("inf")
 
     # 探索の深さを決定
     stoneNum = count_stone(board)
@@ -42,7 +40,7 @@ def getAction(board, moves) -> List[int]:
     maxEvalMove = float("-inf"), None
 
     pool = Pool()
-    args = [(board, move, limit, alpha, beta) for move in moves]
+    args = [(board, move, limit) for move in moves]
     results = pool.map(eval_move, args)
     pool.close()
     pool.join()
@@ -127,6 +125,7 @@ def count_stone(board):
 
 
 def test2(board, limit):
+    "pythonとCの評価値を比較する"
     moves = OthelloLogic.getMoves(board, 1, 8)
     move = moves[0]
 
@@ -135,7 +134,7 @@ def test2(board, limit):
 
     nextBoard = OthelloLogic.execute(copy.deepcopy(board), move, 1, 8)
     cModule = SetupC.generate_c_module()
-    eval = cModule.minLevel(nextBoard, limit - 1, -1, float("-inf"), float("inf"))
+    eval = cModule.minLevelWrapper(nextBoard, limit - 1, -1)
     print(f"C eval: {eval}")
 
 

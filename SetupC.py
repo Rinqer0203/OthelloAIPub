@@ -24,15 +24,12 @@ class CModule:
         self.dll.getMovesC.restype = ctypes.POINTER(
             (ctypes.c_int * 2) * (MOVES_MAX_LENGTH + 1)
         )
-        self.dll.Action.restype = ctypes.POINTER(ctypes.c_int * 2)
-        self.dll.evaluate.restype = ctypes.c_float
-        self.dll.minLevel.restype = ctypes.c_float
-        self.dll.minLevel.argtypes = [
+
+        self.dll.minLevelWrapper.restype = ctypes.c_float
+        self.dll.minLevelWrapper.argtypes = [
             ctypes.POINTER((ctypes.c_int * 8) * 8),  # ボード配列の型
             ctypes.c_int,  # limit
             ctypes.c_int,  # player
-            ctypes.c_float,  # alpha
-            ctypes.c_float,  # beta
         ]
 
     def __convert_2d_array(self, c_type, data):
@@ -45,17 +42,6 @@ class CModule:
         for i, row in enumerate(data):
             array[i] = (c_type * cols)(*row)
         return array
-
-    def get_action(self, board, moves) -> List[int]:
-        board_array = self.__convert_2d_array(ctypes.c_int, board)
-        moves_array = self.__convert_2d_array(
-            ctypes.c_int, moves[: self.MOVES_MAX_LENGTH]
-        )
-
-        result_ptr = self.dll.Action(board_array, moves_array, len(moves))
-
-        # 結果をPythonのリストに変換
-        return list(result_ptr.contents)
 
     def get_moves(self, board, player):
         board_array = self.__convert_2d_array(ctypes.c_int, board)
@@ -70,13 +56,13 @@ class CModule:
 
         return moves
 
-    def evaluate(self, board, player, limit):
-        board_array = self.__convert_2d_array(ctypes.c_int, board)
-        return self.dll.evaluate(board_array, player, limit)
-
     def minLevel(self, board, limit, player, alpha, beta):
         board_array = self.__convert_2d_array(ctypes.c_int, board)
         return self.dll.minLevel(board_array, limit, player, alpha, beta)
+
+    def minLevelWrapper(self, board, limit, player):
+        board_array = self.__convert_2d_array(ctypes.c_int, board)
+        return self.dll.minLevelWrapper(board_array, limit, player)
 
 
 def generate_c_module() -> CModule:
