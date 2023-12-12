@@ -36,7 +36,9 @@ int (*getMovesC(int board[][BOARD_SIZE], int player))[2]
 float minLevelWrapper(int board[][BOARD_SIZE], int limit, int player)
 {
     evalCnt = 0;
-    return minLevel(board, limit, player, -FLT_MAX, FLT_MAX);
+    float eval = minLevel(board, limit, player, -FLT_MAX, FLT_MAX);
+    printf("evalCnt: %d\n", evalCnt);
+    return eval;
 }
 
 //--------------------------------------------------
@@ -53,7 +55,10 @@ float minLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, floa
     int moveLen = getMoves(board, moves, player);
 
     if (limit == 0 || moveLen == 0)
+    {
+        evalCnt++;
         return evaluateBoard(board);
+    }
 
     float minValue = FLT_MAX;
     for (int i = 0; i < moveLen; i++)
