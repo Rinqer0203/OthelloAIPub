@@ -26,7 +26,7 @@ def getAction(board, moves) -> List[int]:
     start_time = time.time()
 
     # デフォルトの探索の深さを決定
-    limit = 7
+    limit = 5
 
     stoneNum, emptyNum = count_stone(board)
     print(f"stoneNum: {stoneNum} emptyNum: {emptyNum}")

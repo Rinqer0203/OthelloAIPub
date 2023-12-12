@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 
+// ------基本的な石の評価------
+
 const int baseBoardPoint[BOARD_SIZE][BOARD_SIZE] = {
     {30, -12, 0, -1, -1, 0, -12, 30},
     {-12, -15, -3, -3, -3, -3, -15, -12},
@@ -34,40 +36,6 @@ bool isSpecialCornerAround(int x, int y, int board[BOARD_SIZE][BOARD_SIZE], int 
     return false;
 }
 
-float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE])
-{
-    int playerStones = 0, enemyStones = 0;
-
-    for (int x = 0; x < BOARD_SIZE; x++)
-    {
-        for (int y = 0; y < BOARD_SIZE; y++)
-        {
-            if (board[x][y] == 1)
-            {
-                playerStones++;
-            }
-            else if (board[x][y] == -1)
-            {
-                enemyStones++;
-            }
-        }
-    }
-    if (playerStones + enemyStones == 0)
-        return 0.0f;
-
-    float normalizedDiff = (float)(playerStones - enemyStones) / (playerStones + enemyStones) * 5;
-    Vec2 enemyMoves[MAX_MOVES];
-    Vec2 playerMoves[MAX_MOVES];
-    int enemyMovesLen = getMoves(board, enemyMoves, -1);
-    int playerMovesLen = getMoves(board, playerMoves, 1);
-    if (enemyMovesLen + playerMovesLen == 0)
-        normalizedDiff *= 50;
-
-    int moveDiff = playerMovesLen - enemyMovesLen;
-
-    return normalizedDiff + moveDiff;
-}
-
 float evaluateBase(int board[BOARD_SIZE][BOARD_SIZE])
 {
     int playerScore = 0, enemyScore = 0;
@@ -91,6 +59,35 @@ float evaluateBase(int board[BOARD_SIZE][BOARD_SIZE])
     return (float)(playerScore - enemyScore);
 }
 
+// ------石の数の評価------
+
+float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE])
+{
+    int playerStones = 0, enemyStones = 0;
+
+    for (int x = 0; x < BOARD_SIZE; x++)
+    {
+        for (int y = 0; y < BOARD_SIZE; y++)
+        {
+            if (board[x][y] == 1)
+            {
+                playerStones++;
+            }
+            else if (board[x][y] == -1)
+            {
+                enemyStones++;
+            }
+        }
+    }
+    if (playerStones + enemyStones == 0)
+        return 0.0f;
+
+    float normalizedDiff = (float)(playerStones - enemyStones) / (playerStones + enemyStones) * 5;
+    return normalizedDiff;
+}
+
+// ------確定石の評価------
+
 int countInDirection(int board[BOARD_SIZE][BOARD_SIZE], int player, int startX, int startY, int deltaX, int deltaY)
 {
     int count = 0;
@@ -104,19 +101,20 @@ int countInDirection(int board[BOARD_SIZE][BOARD_SIZE], int player, int startX, 
         y += deltaY;
     }
 
-    return count;
+    if (count > 0)
+        return count - 1;
+    return 0;
 }
 
 int countConfirmedStonesFromCorner(int board[BOARD_SIZE][BOARD_SIZE], int player, int cornerX, int cornerY)
 {
     int confirmed = 0;
 
+    confirmed += board[cornerX][cornerY] == player ? 1 : 0;
     // 水平方向
     confirmed += countInDirection(board, player, cornerX, cornerY, (cornerX == 0) ? 1 : -1, 0);
-
     // 垂直方向
     confirmed += countInDirection(board, player, cornerX, cornerY, 0, (cornerY == 0) ? 1 : -1);
-
     // 対角線方向
     confirmed += countInDirection(board, player, cornerX, cornerY, (cornerX == 0) ? 1 : -1, (cornerY == 0) ? 1 : -1);
 
@@ -125,21 +123,36 @@ int countConfirmedStonesFromCorner(int board[BOARD_SIZE][BOARD_SIZE], int player
 
 int countConfirmedStones(int board[BOARD_SIZE][BOARD_SIZE], int player)
 {
-    int confirmedStones = 0;
+    int evalConfirmedStones = 0;
 
     // 4つの角から確定石を数える
-    confirmedStones += countConfirmedStonesFromCorner(board, player, 0, 0);                           // 左上
-    confirmedStones += countConfirmedStonesFromCorner(board, player, BOARD_SIZE - 1, 0);              // 右上
-    confirmedStones += countConfirmedStonesFromCorner(board, player, 0, BOARD_SIZE - 1);              // 左下
-    confirmedStones += countConfirmedStonesFromCorner(board, player, BOARD_SIZE - 1, BOARD_SIZE - 1); // 右下
+    evalConfirmedStones += countConfirmedStonesFromCorner(board, player, 0, 0);                           // 左上
+    evalConfirmedStones += countConfirmedStonesFromCorner(board, player, BOARD_SIZE - 1, 0);              // 右上
+    evalConfirmedStones += countConfirmedStonesFromCorner(board, player, 0, BOARD_SIZE - 1);              // 左下
+    evalConfirmedStones += countConfirmedStonesFromCorner(board, player, BOARD_SIZE - 1, BOARD_SIZE - 1); // 右下
 
-    return confirmedStones;
+    return evalConfirmedStones;
 }
+
+// ------盤面の評価------
 
 float evaluateBoard(int board[][BOARD_SIZE])
 {
-    float stoneCount = evaluateStoneCount(board);
-    float base = evaluateBase(board);
-    float confirmedStones = countConfirmedStones(board, 1) - countConfirmedStones(board, -1);
-    return (stoneCount + base + confirmedStones);
+    Vec2 enemyMoves[MAX_MOVES];
+    Vec2 playerMoves[MAX_MOVES];
+    int enemyMovesLen = getMoves(board, enemyMoves, -1);
+    int playerMovesLen = getMoves(board, playerMoves, 1);
+
+    // 石の数の評価
+    float evalStoneCount = evaluateStoneCount(board);
+    // 終局時は石の数の評価を優先
+    if (enemyMovesLen == 0 && playerMovesLen == 0)
+        return evalStoneCount * 50;
+    // 基本的な石の評価
+    float evalBase = evaluateBase(board);
+    // 確定石の評価
+    float evalConfirmedStones = countConfirmedStones(board, 1) - countConfirmedStones(board, -1);
+    // 手数の評価
+    float evalMoves = (float)(playerMovesLen - enemyMovesLen);
+    return (evalStoneCount + evalBase + evalConfirmedStones + evalMoves);
 }
