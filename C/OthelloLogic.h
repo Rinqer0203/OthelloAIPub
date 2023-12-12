@@ -12,6 +12,7 @@ typedef struct
     int y;
 } Vec2;
 
+const Vec2 DIRS[8];
 const Vec2 leftUpAround[3];
 const Vec2 rightUpAround[3];
 const Vec2 leftDownAround[3];

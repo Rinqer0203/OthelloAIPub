@@ -143,7 +143,7 @@ def benchmark_minimax2(cModule, board, limit):
 
 
 def benchmark_minimax2_exe():
-    cModule = generate_enemy_c_module()
+    cModule = generate_c_module()
     limit = 10
 
     benchmark_minimax2(cModule, TestBoardProvider.generate_initial_board(), limit)

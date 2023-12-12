@@ -7,12 +7,12 @@
 
 const int baseBoardPoint[BOARD_SIZE][BOARD_SIZE] = {
     {30, -12, 0, -1, -1, 0, -12, 30},
-    {-12, -15, -3, -3, -3, -3, -15, -12},
+    {-12, -18, -3, -3, -3, -3, -18, -12},
     {0, -3, 0, -1, -1, 0, -3, 0},
     {-1, -3, -1, -1, -1, -1, -3, -1},
     {-1, -3, -1, -1, -1, -1, -3, -1},
     {0, -3, 0, -1, -1, 0, -3, 0},
-    {-12, -15, -3, -3, -3, -3, -15, -12},
+    {-12, -18, -3, -3, -3, -3, -18, -12},
     {30, -12, 0, -1, -1, 0, -12, 30}};
 
 bool isSpecialCornerAround(int x, int y, int board[BOARD_SIZE][BOARD_SIZE], int player)
@@ -146,8 +146,11 @@ float evaluateBoard(int board[][BOARD_SIZE])
     // 基本的な石の評価
     float evalBase = evaluateBase(board);
     // 確定石の評価
-    float evalConfirmedStones = countConfirmedStones(board, 1) - countConfirmedStones(board, -1);
+    float evalConfirmedStones = countConfirmedStones(board, 1);
+    evalConfirmedStones *= 0.7f;
     // 手数の評価
     float evalMoves = (float)(playerMovesLen - enemyMovesLen);
+    evalMoves *= 0.5f;
+
     return (evalStoneCount + evalBase + evalConfirmedStones + evalMoves);
 }
