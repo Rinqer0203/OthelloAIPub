@@ -9,8 +9,8 @@ float minLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, floa
 float maxLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, float beta);
 float evaluateBoard(int board[][BOARD_SIZE], int player);
 bool isSpecialCornerAround(int x, int y, int board[BOARD_SIZE][BOARD_SIZE], int player);
-float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE], int player);
-float evaluateBase(int board[BOARD_SIZE][BOARD_SIZE], int player);
+float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE]);
+float evaluateBase(int board[BOARD_SIZE][BOARD_SIZE]);
 void copyBoard(int src[][BOARD_SIZE], int dest[][BOARD_SIZE]);
 
 int evalCnt = 0;
@@ -107,9 +107,9 @@ float maxLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, floa
 float evaluateBoard(int board[][BOARD_SIZE], int player)
 {
     evalCnt++;
-    float stoneCount = evaluateStoneCount(board, player);
-    float base = evaluateBase(board, player);
-    return (stoneCount + base) * player;
+    float stoneCount = evaluateStoneCount(board);
+    float base = evaluateBase(board);
+    return (stoneCount + base);
 }
 
 const int baseBoardPoint[BOARD_SIZE][BOARD_SIZE] = {
@@ -143,7 +143,7 @@ bool isSpecialCornerAround(int x, int y, int board[BOARD_SIZE][BOARD_SIZE], int 
     return false;
 }
 
-float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE], int player)
+float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE])
 {
     int playerStones = 0, enemyStones = 0;
 
@@ -151,11 +151,11 @@ float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE], int player)
     {
         for (int y = 0; y < BOARD_SIZE; y++)
         {
-            if (board[x][y] == player)
+            if (board[x][y] == 1)
             {
                 playerStones++;
             }
-            else if (board[x][y] == -player)
+            else if (board[x][y] == -1)
             {
                 enemyStones++;
             }
@@ -166,7 +166,7 @@ float evaluateStoneCount(int board[BOARD_SIZE][BOARD_SIZE], int player)
     return (float)(playerStones - enemyStones) / (playerStones + enemyStones) * 5;
 }
 
-float evaluateBase(int board[BOARD_SIZE][BOARD_SIZE], int player)
+float evaluateBase(int board[BOARD_SIZE][BOARD_SIZE])
 {
     int playerScore = 0, enemyScore = 0;
 
@@ -174,14 +174,14 @@ float evaluateBase(int board[BOARD_SIZE][BOARD_SIZE], int player)
     {
         for (int y = 0; y < BOARD_SIZE; y++)
         {
-            if (board[x][y] == player)
+            if (board[x][y] == 1)
             {
-                int score = isSpecialCornerAround(x, y, board, player) ? 0 : baseBoardPoint[x][y];
+                int score = isSpecialCornerAround(x, y, board, 1) ? 0 : baseBoardPoint[x][y];
                 playerScore += score;
             }
-            else if (board[x][y] == -player)
+            else if (board[x][y] == -1)
             {
-                int score = isSpecialCornerAround(x, y, board, -player) ? 0 : baseBoardPoint[x][y];
+                int score = isSpecialCornerAround(x, y, board, -1) ? 0 : baseBoardPoint[x][y];
                 enemyScore += score;
             }
         }

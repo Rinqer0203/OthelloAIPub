@@ -126,7 +126,7 @@ def benchmark_minimax(cModule, board, limit):
 if __name__ == "__main__":
     compile_c()
     cModule = generate_c_module()
-    board = TestBoardProvider.generate_board2()
+    board = TestBoardProvider.generate_evaluate_board1()
     moves = OthelloLogic.getMoves(board, 1, 8)
     player = 1
 
