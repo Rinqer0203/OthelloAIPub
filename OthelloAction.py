@@ -25,19 +25,20 @@ def getAction(board, moves) -> List[int]:
     # 処理時間計測開始
     start_time = time.time()
 
-    # 探索の深さを決定
-    stoneNum = count_stone(board)
-    print(f"stoneNum: {stoneNum}")
+    # デフォルトの探索の深さを決定
     limit = 7
 
-    voidCellNum = count_void_cell(board)
-    if voidCellNum <= 14:
+    stoneNum, emptyNum = count_stone(board)
+    print(f"stoneNum: {stoneNum} emptyNum: {emptyNum}")
+
+    # 空白マスの数が少ないときは完全読み
+    if emptyNum <= 14:
+        print(f"*****完全読み*****")
         limit = 100
         # 16空白のときの完全よみで62sかかった
         # 15空白のときの完全よみで15sかかった
         # 14空白のときの完全よみで4.8sかかった
         # 盤面によってかかる時間は大きく違うらしい
-        print(f"完全読み void cell : {voidCellNum}")
     print(f"limit: {limit}")
 
     maxEvalMove = float("-inf"), None
@@ -119,12 +120,15 @@ def count_stone(board):
     石の数をカウントして返す
     """
     stoneCnt = 0
+    emptyCnt = 0
     # 石の数をカウント
     for x in range(len(board)):
         for y in range(len(board)):
             if board[x][y] != 0:
                 stoneCnt += 1
-    return stoneCnt
+            else:
+                emptyCnt += 1
+    return stoneCnt, emptyCnt
 
 
 def count_void_cell(board):
