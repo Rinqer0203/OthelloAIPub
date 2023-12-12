@@ -38,7 +38,7 @@ def getAction(board, moves) -> List[int]:
         print("*****アクティブモード*****")
 
     # 空白マスの数が少ないときは完全読み default = 14 max = 18
-    if emptyNum <= 14:
+    if emptyNum <= 16:
         print(f"*****完全読み*****")
         limit = 100
         # 16空白のときの完全よみで62sかかった
