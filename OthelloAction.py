@@ -26,7 +26,11 @@ def getAction(board, moves) -> List[int]:
     start_time = time.time()
 
     # デフォルトの探索の深さを決定 default = 7 max = 10
-    limit = 8
+    # 7 : ほとんど5秒以内に終わる
+    # 8 : 最大12秒くらい
+    # 9 : 10 - 30s
+    # 10 : 20 - 90s
+    limit = 9
 
     stoneNum, emptyNum = count_stone(board)
     print(f"stoneNum: {stoneNum} emptyNum: {emptyNum}")
@@ -38,12 +42,12 @@ def getAction(board, moves) -> List[int]:
         print("*****アクティブモード*****")
 
     # 空白マスの数が少ないときは完全読み default = 14 max = 18
-    if emptyNum <= 16:
+    if emptyNum <= 15:
         print(f"*****完全読み*****")
         limit = 100
-        # 16空白のときの完全よみで62sかかった
-        # 15空白のときの完全よみで15sかかった
         # 14空白のときの完全よみで4.8sかかった
+        # 15空白のときの完全よみで15sかかった
+        # 16空白のときの完全よみで62sかかった
         # 盤面によってかかる時間は大きく違うっぽい
     print(f"limit: {limit}")
 

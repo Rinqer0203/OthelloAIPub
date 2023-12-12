@@ -8,7 +8,7 @@ import SetupC
 if __name__ == "__main__":
     SetupC.compile_c()
     board = TestBoardProvider.generate_initial_board()
-    player = -1
+    player = 1
     turnCnt = 1
 
     while True:
