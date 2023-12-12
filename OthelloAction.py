@@ -28,16 +28,16 @@ def getAction(board, moves) -> List[int]:
     # 探索の深さを決定
     stoneNum = count_stone(board)
     print(f"stoneNum: {stoneNum}")
-    limit = 0
-    if stoneNum >= 48:
-        limit = 7
-    else:
-        limit = 5 if len(moves) >= 12 else 6  # 6
-    limit = 6
+    limit = 7
 
-    if count_void_cell(board) <= 15:
+    voidCellNum = count_void_cell(board)
+    if voidCellNum <= 14:
         limit = 100
-        print(f"完全よみ void cell : {count_void_cell(board)}")
+        # 16空白のときの完全よみで62sかかった
+        # 15空白のときの完全よみで15sかかった
+        # 14空白のときの完全よみで4.8sかかった
+        # 盤面によってかかる時間は大きく違うらしい
+        print(f"完全読み void cell : {voidCellNum}")
     print(f"limit: {limit}")
 
     maxEvalMove = float("-inf"), None
