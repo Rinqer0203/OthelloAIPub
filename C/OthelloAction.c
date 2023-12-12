@@ -58,7 +58,7 @@ float minLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, floa
     if (limit == 0 || moveLen == 0)
     {
         evalCnt++;
-        return evaluateBoardInactive(board);
+        return evaluateBoard(board);
     }
 
     float minValue = FLT_MAX;
@@ -88,7 +88,7 @@ float maxLevel(int board[][BOARD_SIZE], int limit, int player, float alpha, floa
     if (limit == 0 || moveLen == 0)
     {
         evalCnt++;
-        return evaluateBoardInactive(board);
+        return evaluateBoard(board);
     }
 
     float maxValue = -FLT_MAX;

@@ -25,14 +25,20 @@ def getAction(board, moves) -> List[int]:
     # 処理時間計測開始
     start_time = time.time()
 
-    # デフォルトの探索の深さを決定
-    limit = 5
+    # デフォルトの探索の深さを決定 default = 7
+    limit = 7
 
     stoneNum, emptyNum = count_stone(board)
     print(f"stoneNum: {stoneNum} emptyNum: {emptyNum}")
 
-    # 空白マスの数が少ないときは完全読み
-    if emptyNum <= 14:
+    if stoneNum < 34 and False:
+        print("*****非アクティブモード*****")
+        return inactive_action(board, moves, 1)
+    else:
+        print("*****アクティブモード*****")
+
+    # 空白マスの数が少ないときは完全読み default = 14
+    if emptyNum <= 16:
         print(f"*****完全読み*****")
         limit = 100
         # 16空白のときの完全よみで62sかかった
