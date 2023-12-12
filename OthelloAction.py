@@ -25,26 +25,26 @@ def getAction(board, moves) -> List[int]:
     # 処理時間計測開始
     start_time = time.time()
 
-    # デフォルトの探索の深さを決定 default = 7
-    limit = 7
+    # デフォルトの探索の深さを決定 default = 7 max = 10
+    limit = 10
 
     stoneNum, emptyNum = count_stone(board)
     print(f"stoneNum: {stoneNum} emptyNum: {emptyNum}")
 
-    if stoneNum < 34 and False:
+    if stoneNum < 8:
         print("*****非アクティブモード*****")
         return inactive_action(board, moves, 1)
     else:
         print("*****アクティブモード*****")
 
-    # 空白マスの数が少ないときは完全読み default = 14
-    if emptyNum <= 16:
+    # 空白マスの数が少ないときは完全読み default = 14 max = 18
+    if emptyNum <= 18:
         print(f"*****完全読み*****")
         limit = 100
         # 16空白のときの完全よみで62sかかった
         # 15空白のときの完全よみで15sかかった
         # 14空白のときの完全よみで4.8sかかった
-        # 盤面によってかかる時間は大きく違うらしい
+        # 盤面によってかかる時間は大きく違うっぽい
     print(f"limit: {limit}")
 
     maxEvalMove = float("-inf"), None
@@ -114,13 +114,6 @@ def maxLevel(board, move, limit, player, alpha, beta):
     return alpha
 
 
-def check_active_mode(board):
-    """
-    30ターン経過したらTrueになる
-    """
-    return count_stone(board) >= 34
-
-
 def count_stone(board):
     """
     石の数をカウントして返す
@@ -135,18 +128,6 @@ def count_stone(board):
             else:
                 emptyCnt += 1
     return stoneCnt, emptyCnt
-
-
-def count_void_cell(board):
-    """
-    空きマスの数をカウントして返す
-    """
-    voidCellCnt = 0
-    for x in range(len(board)):
-        for y in range(len(board)):
-            if board[x][y] == 0:
-                voidCellCnt += 1
-    return voidCellCnt
 
 
 def test2(board, limit):
